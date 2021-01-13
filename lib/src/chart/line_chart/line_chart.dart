@@ -11,14 +11,15 @@ import 'line_chart_painter.dart';
 class LineChart extends ImplicitlyAnimatedWidget {
   /// Determines how the [LineChart] should be look like.
   final LineChartData data;
+  final bool longPressInScrollable;
 
   /// [data] determines how the [LineChart] should be look like,
   /// when you make any change in the [LineChartData], it updates
   /// new values with animation, and duration is [swapAnimationDuration].
   const LineChart(
-    this.data, {
-    Duration swapAnimationDuration = const Duration(milliseconds: 150),
-  }) : super(duration: swapAnimationDuration);
+      this.data, {this.longPressInScrollable = false,
+        Duration swapAnimationDuration = const Duration(milliseconds: 150),
+      }) : super(duration: swapAnimationDuration);
 
   /// Creates a [_LineChartState]
   @override
@@ -51,7 +52,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         }
 
         final LineTouchResponse response =
-            _touchHandler?.handleTouch(FlLongPressStart(d.localPosition), chartSize);
+        _touchHandler?.handleTouch(FlLongPressStart(d.localPosition), chartSize);
         if (_canHandleTouch(response, touchData)) {
           touchData.touchCallback(response);
         }
@@ -63,7 +64,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         }
 
         final LineTouchResponse response =
-            _touchHandler?.handleTouch(FlLongPressEnd(d.localPosition), chartSize);
+        _touchHandler?.handleTouch(FlLongPressEnd(d.localPosition), chartSize);
         if (_canHandleTouch(response, touchData)) {
           touchData.touchCallback(response);
         }
@@ -75,7 +76,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         }
 
         final LineTouchResponse response =
-            _touchHandler?.handleTouch(FlLongPressMoveUpdate(d.localPosition), chartSize);
+        _touchHandler?.handleTouch(FlLongPressMoveUpdate(d.localPosition), chartSize);
         if (_canHandleTouch(response, touchData)) {
           touchData.touchCallback(response);
         }
@@ -99,7 +100,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         }
 
         final LineTouchResponse response =
-            _touchHandler?.handleTouch(FlPanEnd(Offset.zero, details.velocity), chartSize);
+        _touchHandler?.handleTouch(FlPanEnd(Offset.zero, details.velocity), chartSize);
         if (_canHandleTouch(response, touchData)) {
           touchData.touchCallback(response);
         }
@@ -111,7 +112,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         }
 
         final LineTouchResponse response =
-            _touchHandler?.handleTouch(FlPanStart(details.localPosition), chartSize);
+        _touchHandler?.handleTouch(FlPanStart(details.localPosition), chartSize);
         if (_canHandleTouch(response, touchData)) {
           touchData.touchCallback(response);
         }
@@ -123,7 +124,55 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         }
 
         final LineTouchResponse response =
-            _touchHandler?.handleTouch(FlPanMoveUpdate(details.localPosition), chartSize);
+        _touchHandler?.handleTouch(FlPanMoveUpdate(details.localPosition), chartSize);
+        if (_canHandleTouch(response, touchData)) {
+          touchData.touchCallback(response);
+        }
+      },
+      onHorizontalDragDown: widget.longPressInScrollable?null:(DragDownDetails details) {
+        final Size chartSize = _getChartSize();
+        if (chartSize == null) {
+          return;
+        }
+
+        final LineTouchResponse response =
+        _touchHandler?.handleTouch(FlPanStart(details.localPosition), chartSize);
+        if (_canHandleTouch(response, touchData)) {
+          touchData.touchCallback(response);
+        }
+      },
+      onHorizontalDragCancel: widget.longPressInScrollable?null:() {
+        final Size chartSize = _getChartSize();
+        if (chartSize == null) {
+          return;
+        }
+
+        final LineTouchResponse response = _touchHandler?.handleTouch(
+            FlPanEnd(Offset.zero, const Velocity(pixelsPerSecond: Offset.zero)), chartSize);
+        if (_canHandleTouch(response, touchData)) {
+          touchData.touchCallback(response);
+        }
+      },
+      onHorizontalDragUpdate: widget.longPressInScrollable?null:(DragUpdateDetails details) {
+        final Size chartSize = _getChartSize();
+        if (chartSize == null) {
+          return;
+        }
+
+        final LineTouchResponse response =
+        _touchHandler?.handleTouch(FlPanMoveUpdate(details.localPosition), chartSize);
+        if (_canHandleTouch(response, touchData)) {
+          touchData.touchCallback(response);
+        }
+      },
+      onHorizontalDragEnd: widget.longPressInScrollable?null:(DragEndDetails details) {
+        final Size chartSize = _getChartSize();
+        if (chartSize == null) {
+          return;
+        }
+
+        final LineTouchResponse response =
+        _touchHandler?.handleTouch(FlPanEnd(Offset.zero, details.velocity), chartSize);
         if (_canHandleTouch(response, touchData)) {
           touchData.touchCallback(response);
         }
@@ -133,10 +182,10 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
         size: getDefaultSize(MediaQuery.of(context).size),
         painter: LineChartPainter(_withTouchedIndicators(_lineChartDataTween.evaluate(animation)),
             _withTouchedIndicators(showingData), (touchHandler) {
-          setState(() {
-            _touchHandler = touchHandler;
-          });
-        }, textScale: MediaQuery.of(context).textScaleFactor),
+              setState(() {
+                _touchHandler = touchHandler;
+              });
+            }, textScale: MediaQuery.of(context).textScaleFactor),
       ),
     );
   }
@@ -219,7 +268,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     _lineChartDataTween = visitor(
       _lineChartDataTween,
       _getData(),
-      (dynamic value) => LineChartDataTween(begin: value),
+          (dynamic value) => LineChartDataTween(begin: value),
     );
   }
 }
