@@ -1,3 +1,18 @@
+## 0.20.1
+* [BREAKING] We now support flutter version 2.0 (null-safety), check out the [migration guide](https://dart.dev/null-safety/migration-guide).
+* [NEW_CHART] We have added [RadarChart](https://github.com/payam-zahedi/fl_chart/blob/master/repo_files/documentations/radar_chart.md). Thanks to [Payam Zahedi](https://github.com/payam-zahedi)!
+
+## 0.20.0-nullsafety1
+* [BREAKING] **We have migrated our project to null-safety. You may need to change your source-code to compile**. check [migration guide](https://dart.dev/null-safety/migration-guide).
+* [BREAKING] You cannot set null value on FlSpot any more (use FlSpot.nullSpot instead).
+
+## 0.12.3
+* [Bugfix] Fixed PieChart exception bug on sections tap, #514.
+* [Bugfix] Fixed PieChart badges problem, #538.
+* [Bugfix] Fixed Bug of drawing lines with strokeWidth zero, #558.
+* [Improvement] Updated example app to support web.
+* [Improvement] Show tooltips on mouse hover on Web, and Desktop.
+
 ## 0.12.2
 * [Bugfix] Fixed PieChart badges draw in first frame problem, #513.
 * [Improvement] Use CanvasWrapper to proxy draw functions (It does not have any effect on the result, it makes the code testable)
