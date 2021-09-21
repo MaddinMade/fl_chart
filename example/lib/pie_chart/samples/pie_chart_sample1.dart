@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-
 import 'indicator.dart';
+import 'package:example/utils/color_extensions.dart';
 
 class PieChartSample1 extends StatefulWidget {
   @override
@@ -9,7 +9,7 @@ class PieChartSample1 extends StatefulWidget {
 }
 
 class PieChartSample1State extends State {
-  int touchedIndex;
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +64,16 @@ class PieChartSample1State extends State {
                 aspectRatio: 1,
                 child: PieChart(
                   PieChartData(
-                      pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+                      pieTouchData:
+                          PieTouchData(touchCallback: (FlTouchEvent event, pieTouchResponse) {
                         setState(() {
-                          if (pieTouchResponse.touchInput is FlLongPressEnd ||
-                              pieTouchResponse.touchInput is FlPanEnd) {
+                          if (!event.isInterestedForInteractions ||
+                              pieTouchResponse == null ||
+                              pieTouchResponse.touchedSection == null) {
                             touchedIndex = -1;
-                          } else {
-                            touchedIndex = pieTouchResponse.touchedSectionIndex;
+                            return;
                           }
+                          touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
                         });
                       }),
                       startDegreeOffset: 180,
@@ -95,50 +97,68 @@ class PieChartSample1State extends State {
       4,
       (i) {
         final isTouched = i == touchedIndex;
-        final double opacity = isTouched ? 1 : 0.6;
+        final opacity = isTouched ? 1.0 : 0.6;
+
+        final color0 = const Color(0xff0293ee);
+        final color1 = const Color(0xfff8b250);
+        final color2 = const Color(0xff845bef);
+        final color3 = const Color(0xff13d38e);
+
         switch (i) {
           case 0:
             return PieChartSectionData(
-              color: const Color(0xff0293ee).withOpacity(opacity),
+              color: color0.withOpacity(opacity),
               value: 25,
               title: '',
               radius: 80,
               titleStyle: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xff044d7c)),
               titlePositionPercentageOffset: 0.55,
+              borderSide: isTouched
+                  ? BorderSide(color: color0.darken(40), width: 6)
+                  : BorderSide(color: color0.withOpacity(0)),
             );
           case 1:
             return PieChartSectionData(
-              color: const Color(0xfff8b250).withOpacity(opacity),
+              color: color1.withOpacity(opacity),
               value: 25,
               title: '',
               radius: 65,
               titleStyle: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xff90672d)),
               titlePositionPercentageOffset: 0.55,
+              borderSide: isTouched
+                  ? BorderSide(color: color1.darken(40), width: 6)
+                  : BorderSide(color: color2.withOpacity(0)),
             );
           case 2:
             return PieChartSectionData(
-              color: const Color(0xff845bef).withOpacity(opacity),
+              color: color2.withOpacity(opacity),
               value: 25,
               title: '',
               radius: 60,
               titleStyle: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xff4c3788)),
               titlePositionPercentageOffset: 0.6,
+              borderSide: isTouched
+                  ? BorderSide(color: color2.darken(40), width: 6)
+                  : BorderSide(color: color2.withOpacity(0)),
             );
           case 3:
             return PieChartSectionData(
-              color: const Color(0xff13d38e).withOpacity(opacity),
+              color: color3.withOpacity(opacity),
               value: 25,
               title: '',
               radius: 70,
               titleStyle: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xff0c7f55)),
               titlePositionPercentageOffset: 0.55,
+              borderSide: isTouched
+                  ? BorderSide(color: color3.darken(40), width: 6)
+                  : BorderSide(color: color2.withOpacity(0)),
             );
           default:
-            return null;
+            throw Error();
         }
       },
     );

@@ -328,9 +328,9 @@ void main() {
       expect(
           sample ==
               sampleClone.copyWith(
-                touchCallback: (response) {},
+                touchCallback: (event, response) {},
               ),
-          true);
+          false);
       expect(
           sample ==
               sampleClone.copyWith(
@@ -349,41 +349,6 @@ void main() {
                 handleBuiltInTouches: true,
               ),
           false);
-    });
-
-    test('ScatterTouchResponse equality test', () {
-      final ScatterTouchResponse sample1 = ScatterTouchResponse(
-        FlPanStart(const Offset(0, 0)),
-        ScatterSpot(3, 4),
-        1,
-      );
-      final ScatterTouchResponse sample2 = ScatterTouchResponse(
-        FlPanStart(const Offset(0, 0)),
-        ScatterSpot(3, 4),
-        1,
-      );
-      expect(sample1 == sample2, true);
-
-      ScatterTouchResponse sampleChanged = ScatterTouchResponse(
-        FlPanStart(const Offset(0, 3)),
-        ScatterSpot(3, 4),
-        1,
-      );
-      expect(sample1 == sampleChanged, false);
-
-      sampleChanged = ScatterTouchResponse(
-        FlPanStart(const Offset(0, 0)),
-        ScatterSpot(0, 4),
-        1,
-      );
-      expect(sample1 == sampleChanged, false);
-
-      sampleChanged = ScatterTouchResponse(
-        FlPanStart(const Offset(0, 0)),
-        ScatterSpot(3, 4),
-        5,
-      );
-      expect(sample1 == sampleChanged, false);
     });
 
     test('ScatterTouchTooltipData equality test', () {
@@ -411,34 +376,34 @@ void main() {
     test('ScatterTooltipItem equality test', () {
       final ScatterTooltipItem sample1 = ScatterTooltipItem(
         'aa',
-        const TextStyle(color: Colors.red),
-        23,
+        textStyle: const TextStyle(color: Colors.red),
+        bottomMargin: 23,
       );
       final ScatterTooltipItem sample2 = ScatterTooltipItem(
         'aa',
-        const TextStyle(color: Colors.red),
-        23,
+        textStyle: const TextStyle(color: Colors.red),
+        bottomMargin: 23,
       );
       expect(sample1 == sample2, true);
 
       ScatterTooltipItem changed = ScatterTooltipItem(
         'a3a',
-        const TextStyle(color: Colors.red),
-        23,
+        textStyle: const TextStyle(color: Colors.red),
+        bottomMargin: 23,
       );
       expect(sample1 == changed, false);
 
       changed = ScatterTooltipItem(
         'aa',
-        const TextStyle(color: Colors.green),
-        23,
+        textStyle: const TextStyle(color: Colors.green),
+        bottomMargin: 23,
       );
       expect(sample1 == changed, false);
 
       changed = ScatterTooltipItem(
         'aa',
-        const TextStyle(color: Colors.red),
-        0,
+        textStyle: const TextStyle(color: Colors.red),
+        bottomMargin: 0,
       );
       expect(sample1 == changed, false);
     });

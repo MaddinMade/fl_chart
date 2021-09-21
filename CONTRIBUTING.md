@@ -8,11 +8,13 @@ Make sure you have Flutter installed and on your path.
 
 Follow these steps to clone FL Chart and set up the development environment:
 
-1. Clone the project: `git clone https://github.com/imaNNeoFighT/fl_chart.git`
+1. Fork the repository
 
-2. Go into the cloned directory: `cd fl_chart`
+2. Clone the project, you can find it in your repositories: `git clone https://github.com/your-username/fl_chart.git`
 
-3. Install all packages: `flutter packages get`
+3. Go into the cloned directory: `cd fl_chart`
+
+4. Install all packages: `flutter packages get`
 
 ## Before Modifying the Code
 
@@ -33,20 +35,31 @@ CanvasWrapper class holds a canvas and all draw functions proxies through it.
 You should use it for drawing on the canvas, Instead of direct accessing to canvas.
 It makes draw functions testable.
 
+<img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/architecture/fl_chart_architecture.jpg" />
+
+(made with [draw.io](https://drive.google.com/file/d/1bj-2TqTRUh80dRKJk10drPNeA3fp3EA8/view))
+
 
 ## Checking Your Code's Quality
 
 After you have made your changes, you have to make sure your code works
 correctly and meets our guidelines. Our guidelines are:
 
-- Make sure the code passes the tests. To run tests, run `flutter test`.
+You can simply run `make checkstyle`, and if you faced any formatting problem, run `make format`.
 
-- Make sure to run `flutter analyze` and resolve any warnings or errors.
+##### Run `make checkstyle` to ensure that your code is formatted correctly
+- It runs `flutter analyze` to verify that there is no any warning or error.
+- It runs `flutter format --set-exit-if-changed --dry-run --line-length 100 .` to verify that code has formatted correctly.
 
-- The code should be formatted correctly. For Visual Studio Code users, this is
-  automatically enforced. Otherwise, you can run this command inside the
-  project from the command line: `flutter format --line-length 100 .`.
-  We use `flutter format --set-exit-if-changed --dry-run --line-length 100 .` command in CI.
+#### Run `make format` to reformat the code
+- It runs `flutter format --line-length 100 .` to format your code with 100 characters limit.
+
+
+#### Run `make runTests` to ensure that all tests are passing.
+- It runs `flutter test` under the hood.
+
+### Run `make sure` before pushing your code.
+- It runs both `make runTests` and then `make checkstyle` sequentially with a single command.
 
 ## Creating a Pull Request
 

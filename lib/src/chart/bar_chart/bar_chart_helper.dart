@@ -22,14 +22,16 @@ class BarChartHelper {
     if (_cachedResults.containsKey(listWrapper)) {
       return _cachedResults[listWrapper]!.copyWith(readFromCache: true);
     }
-    for (var i = 0; i < barGroups.length; i++) {
-      final barData = barGroups[i];
-      if (barData.barRods.isEmpty) {
-        throw Exception('barRods could not be null or empty');
-      }
+
+    final BarChartGroupData barGroup;
+    try {
+      barGroup = barGroups.firstWhere((element) => element.barRods.isNotEmpty);
+    } catch (e) {
+      // There is no barChartGroupData with at least one barRod
+      return BarChartMinMaxAxisValues(0, 0);
     }
 
-    var maxY = barGroups[0].barRods[0].y;
+    var maxY = barGroup.barRods[0].y;
     var minY = 0.0;
 
     for (var i = 0; i < barGroups.length; i++) {

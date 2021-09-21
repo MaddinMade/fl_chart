@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:example/utils/color_extensions.dart';
 
 class BarChartSample1 extends StatefulWidget {
   final List<Color> availableColors = [
@@ -22,7 +22,7 @@ class BarChartSample1State extends State<BarChartSample1> {
   final Color barBackgroundColor = const Color(0xff72d8bf);
   final Duration animDuration = const Duration(milliseconds: 250);
 
-  int touchedIndex;
+  int touchedIndex = -1;
 
   bool isPlaying = false;
 
@@ -114,6 +114,9 @@ class BarChartSample1State extends State<BarChartSample1> {
           y: isTouched ? y + 1 : y,
           colors: isTouched ? [Colors.yellow] : [barColor],
           width: width,
+          borderSide: isTouched
+              ? BorderSide(color: Colors.yellow.darken(), width: 1)
+              : BorderSide(color: Colors.white, width: 0),
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             y: 20,
@@ -142,7 +145,7 @@ class BarChartSample1State extends State<BarChartSample1> {
           case 6:
             return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
           default:
-            return null;
+            return throw Error();
         }
       });
 
@@ -175,27 +178,47 @@ class BarChartSample1State extends State<BarChartSample1> {
                 case 6:
                   weekDay = 'Sunday';
                   break;
+                default:
+                  throw Error();
               }
               return BarTooltipItem(
-                  weekDay + '\n' + (rod.y - 1).toString(), TextStyle(color: Colors.yellow));
+                weekDay + '\n',
+                TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: (rod.y - 1).toString(),
+                    style: TextStyle(
+                      color: Colors.yellow,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              );
             }),
-        touchCallback: (barTouchResponse) {
+        touchCallback: (FlTouchEvent event, barTouchResponse) {
           setState(() {
-            if (barTouchResponse.spot != null &&
-                barTouchResponse.touchInput is! FlPanEnd &&
-                barTouchResponse.touchInput is! FlLongPressEnd) {
-              touchedIndex = barTouchResponse.spot.touchedBarGroupIndex;
-            } else {
+            if (!event.isInterestedForInteractions ||
+                barTouchResponse == null ||
+                barTouchResponse.spot == null) {
               touchedIndex = -1;
+              return;
             }
+            touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
           });
         },
       ),
       titlesData: FlTitlesData(
         show: true,
+        rightTitles: SideTitles(showTitles: false),
+        topTitles: SideTitles(showTitles: false),
         bottomTitles: SideTitles(
           showTitles: true,
-          getTextStyles: (value) =>
+          getTextStyles: (context, value) =>
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
           margin: 16,
           getTitles: (double value) {
@@ -227,6 +250,7 @@ class BarChartSample1State extends State<BarChartSample1> {
         show: false,
       ),
       barGroups: showingGroups(),
+      gridData: FlGridData(show: false),
     );
   }
 
@@ -236,37 +260,42 @@ class BarChartSample1State extends State<BarChartSample1> {
         enabled: false,
       ),
       titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (value) =>
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-          margin: 16,
-          getTitles: (double value) {
-            switch (value.toInt()) {
-              case 0:
-                return 'M';
-              case 1:
-                return 'T';
-              case 2:
-                return 'W';
-              case 3:
-                return 'T';
-              case 4:
-                return 'F';
-              case 5:
-                return 'S';
-              case 6:
-                return 'S';
-              default:
-                return '';
-            }
-          },
-        ),
-        leftTitles: SideTitles(
-          showTitles: false,
-        ),
-      ),
+          show: true,
+          bottomTitles: SideTitles(
+            showTitles: true,
+            getTextStyles: (context, value) =>
+                const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+            margin: 16,
+            getTitles: (double value) {
+              switch (value.toInt()) {
+                case 0:
+                  return 'M';
+                case 1:
+                  return 'T';
+                case 2:
+                  return 'W';
+                case 3:
+                  return 'T';
+                case 4:
+                  return 'F';
+                case 5:
+                  return 'S';
+                case 6:
+                  return 'S';
+                default:
+                  return '';
+              }
+            },
+          ),
+          leftTitles: SideTitles(
+            showTitles: false,
+          ),
+          topTitles: SideTitles(
+            showTitles: false,
+          ),
+          rightTitles: SideTitles(
+            showTitles: false,
+          )),
       borderData: FlBorderData(
         show: false,
       ),
@@ -294,9 +323,10 @@ class BarChartSample1State extends State<BarChartSample1> {
             return makeGroupData(6, Random().nextInt(15).toDouble() + 6,
                 barColor: widget.availableColors[Random().nextInt(widget.availableColors.length)]);
           default:
-            return null;
+            return throw Error();
         }
       }),
+      gridData: FlGridData(show: false),
     );
   }
 
@@ -304,7 +334,7 @@ class BarChartSample1State extends State<BarChartSample1> {
     setState(() {});
     await Future<dynamic>.delayed(animDuration + const Duration(milliseconds: 50));
     if (isPlaying) {
-      refreshState();
+      await refreshState();
     }
   }
 }

@@ -6,10 +6,15 @@
 ```dart
 BarChart(
   BarChartData(
-    // read about it in the below section
+    // read about it in the BarChartData section
   ),
+  swapAnimationDuration: Duration(milliseconds: 150), // Optional
+  swapAnimationCurve: Curves.linear, // Optional
 );
 ```
+
+### Implicit Animations
+When you change the chart's state, it animates to the new state internally (using [implicit animations](https://flutter.dev/docs/development/ui/animations/implicit-animations)). You can control the animation [duration](https://api.flutter.dev/flutter/dart-core/Duration-class.html) and [curve](https://api.flutter.dev/flutter/animation/Curves-class.html) using optional `swapAnimationDuration` and `swapAnimationCurve` properties, respectively.
 
 ### BarChartData
 |PropName		|Description	|default value|
@@ -51,6 +56,7 @@ enum values {`start`, `end`, `center`, `spaceEvenly`, `spaceAround`, `spaceBetwe
 |gradientTo|determines end of the gradient, each number should be between 0 and 1, [Read More](https://api.flutter.dev/flutter/dart-ui/Gradient/Gradient.linear.html)|Offset(1, 0)|
 |width|stroke width of the rod bar|8|
 |borderRadius|Determines the edge rounding of the bar corners, see [BorderRadius](https://api.flutter.dev/flutter/painting/BorderRadius-class.html). When `null`, it defaults to completely round bars. |null|
+|borderSide|Determines the border stroke around of the bar, see [BorderSide](https://api.flutter.dev/flutter/painting/BorderSide-class.html). When `null`, it defaults to draw no stroke. |null|
 |backDrawRodData|if provided, draws a rod in the background of the line bar, check the [BackgroundBarChartRodData](#BackgroundBarChartRodData)|null|
 |rodStackItem|if you want to have stacked bar chart, provide a list of [BarChartRodStackItem](#BarChartRodStackItem), it will draw over your rod.|[]|
 
@@ -71,16 +77,18 @@ enum values {`start`, `end`, `center`, `spaceEvenly`, `spaceAround`, `spaceBetwe
 |fromY|draw stack item from this value|null|
 |toY|draw stack item to this value|null|
 |color|color of the stack item|null|
+|borderSide|draw border stroke for each stack item|null|
 
 ### BarTouchData ([read about touch handling](handle_touches.md))
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |enabled|determines to enable or disable touch behaviors|true|
+|mouseCursorResolver|you can change the mouse cursor based on the provided [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [BarTouchResponse](#BarTouchResponse)|MouseCursor.defer|
 |touchTooltipData|a [BarTouchTooltipData](#BarTouchTooltipData), that determines how show the tooltip on top of touched spots (appearance of the showing tooltip bubble)|BarTouchTooltipData()|
 |touchExtraThreshold|an [EdgeInsets](https://api.flutter.dev/flutter/painting/EdgeInsets-class.html) class to hold a bounding threshold of touch accuracy|EdgeInsets.all(4)|
 |allowTouchBarBackDraw| if sets true, touch works on backdraw bar line| false |
 |handleBuiltInTouches| set this true if you want the built in touch handling (show a tooltip bubble and an indicator on touched spots) | true|
-|touchCallback| listen to this callback to retrieve touch events, it gives you a [BarTouchResponse](#BarTouchResponse)| null|
+|touchCallback| listen to this callback to retrieve touch/pointer events and responses, it gives you a [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [BarTouchResponse](#BarTouchResponse)| null|
 
 ### BarTouchTooltipData
  |PropName|Description|default value|
@@ -88,25 +96,27 @@ enum values {`start`, `end`, `center`, `spaceEvenly`, `spaceAround`, `spaceBetwe
  |tooltipBgColor|background color of the tooltip bubble|Colors.white|
  |tooltipRoundedRadius|background corner radius of the tooltip bubble|4|
  |tooltipPadding|padding of the tooltip|EdgeInsets.symmetric(horizontal: 16, vertical: 8)|
- |tooltipBottomMargin|bottom margin of the tooltip (to the top of most top spot)|16|
+ |tooltipMargin|margin between the tooltip and the touched spot|16|
  |maxContentWidth|maximum width of the tooltip (if a text row is wider than this, then the text breaks to a new line|120|
  |getTooltipItems|a callback that retrieve [BarTooltipItem](#BarTooltipItem) by the given [BarChartGroupData](#BarChartGroupData), groupIndex, [BarChartRodData](#BarChartRodData) and rodIndex |defaultBarTooltipItem|
  |fitInsideHorizontally| forces tooltip to horizontally shift inside the chart's bounding box| false|
  |fitInsideVertically| forces tooltip to vertically shift inside the chart's bounding box| false|
+ |direction| Controls showing tooltip on top or bottom, default is auto.| auto|
 
 ### BarTooltipItem
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |text|text string of each row in the tooltip bubble|null|
 |textStyle|[TextStyle](https://api.flutter.dev/flutter/dart-ui/TextStyle-class.html) of the showing text row|null|
+|textAlign|[TextAlign](https://api.flutter.dev/flutter/dart-ui/TextAlign-class.html) of the showing text row|TextAlign.center|
+|textDirection|[TextDirection](https://api.flutter.dev/flutter/dart-ui/TextDirection-class.html) of the showing text row|TextDirection.ltr|
+|children|[List<TextSpan>](https://api.flutter.dev/flutter/painting/InlineSpan-class.html) pass additional InlineSpan children for a more advance tooltip|null|
 
 
 ### BarTouchResponse
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |spot|a [BarTouchedSpot](#BarTouchedSpot) class to hold data about touched spot| null |
-|touchInput|a [FlTouchInput](base_chart.md#FlTouchInput) that is the touch behaviour|null|
-
 
 ### BarTouchedSpot
 |PropName|Description|default value|
@@ -138,4 +148,4 @@ enum values {`start`, `end`, `center`, `spaceEvenly`, `spaceAround`, `spaceBetwe
 <img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/bar_chart/bar_chart_sample_4.png" width="300" >
 
 ##### Sample 5 ([Source Code](/example/lib/bar_chart/samples/bar_chart_sample5.dart))
-<img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/bar_chart/bar_chart_sample_5.png" width="300" >
+<img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/bar_chart/bar_chart_sample_5.gif" width="300" >

@@ -17,8 +17,8 @@ class LineChartSample6 extends StatelessWidget {
     FlSpot(6, 1),
   ];
 
-  double minSpotX, maxSpotX;
-  double minSpotY, maxSpotY;
+  late double minSpotX, maxSpotX;
+  late double minSpotY, maxSpotY;
 
   LineChartSample6() {
     minSpotX = spots.first.x;
@@ -26,7 +26,7 @@ class LineChartSample6 extends StatelessWidget {
     minSpotY = spots.first.y;
     maxSpotY = spots.first.y;
 
-    for (FlSpot spot in spots) {
+    for (var spot in spots) {
       if (spot.x > maxSpotX) {
         maxSpotX = spot.x;
       }
@@ -126,7 +126,7 @@ class LineChartSample6 extends StatelessWidget {
 
                       return intValue.toString();
                     },
-                    getTextStyles: (value) => const TextStyle(
+                    getTextStyles: (context, value) => const TextStyle(
                         color: Colors.deepOrange, fontWeight: FontWeight.bold, fontSize: 18),
                     margin: 16,
                   ),
@@ -142,7 +142,7 @@ class LineChartSample6 extends StatelessWidget {
 
                       return intValue.toString();
                     },
-                    getTextStyles: (value) => const TextStyle(
+                    getTextStyles: (context, value) => const TextStyle(
                         color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 18),
                     margin: 16,
                   ),
@@ -151,7 +151,7 @@ class LineChartSample6 extends StatelessWidget {
                     showTitles: true,
                     reservedSize: 28,
                     margin: 8,
-                    getTextStyles: (value) =>
+                    getTextStyles: (context, value) =>
                         const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                     getTitles: (double value) {
                       return value.toInt().toString();

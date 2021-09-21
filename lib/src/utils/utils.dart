@@ -32,6 +32,14 @@ double translateRotatedPosition(double size, double degree) {
   return (size / 4) * math.sin(radians(degree.abs()));
 }
 
+Offset calculateRotationOffset(Size size, double degree) {
+  final rotatedHeight =
+      (size.width * math.sin(radians(degree))).abs() + (size.height * cos(radians(degree))).abs();
+  final rotatedWidth =
+      (size.width * cos(radians(degree))).abs() + (size.height * sin(radians(degree))).abs();
+  return Offset((size.width - rotatedWidth) / 2, (size.height - rotatedHeight) / 2);
+}
+
 /// Decreases [borderRadius] to <= width / 2
 BorderRadius? normalizeBorderRadius(BorderRadius? borderRadius, double width) {
   if (borderRadius == null) {
@@ -74,6 +82,25 @@ BorderRadius? normalizeBorderRadius(BorderRadius? borderRadius, double width) {
   );
 }
 
+/// Default value for BorderSide where borderSide value is not exists
+const BorderSide DefaultBorderSide = BorderSide(width: 0);
+
+/// Decreases [borderSide] to <= width / 2
+BorderSide normalizeBorderSide(BorderSide? borderSide, double width) {
+  if (borderSide == null) {
+    return DefaultBorderSide;
+  }
+
+  double borderWidth;
+  if (borderSide.width > width / 2) {
+    borderWidth = width / 2.toDouble();
+  } else {
+    borderWidth = borderSide.width;
+  }
+
+  return borderSide.copyWith(width: borderWidth);
+}
+
 /// Lerps between a [LinearGradient] colors, based on [t]
 Color lerpGradient(List<Color> colors, List<double> stops, double t) {
   final length = colors.length;
@@ -103,7 +130,7 @@ Color lerpGradient(List<Color> colors, List<double> stops, double t) {
 /// then we round that number by finding nearest number in this pattern:
 /// 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10000,...
 double getEfficientInterval(double axisViewSize, double diffInYAxis,
-    {double pixelPerInterval = 10}) {
+    {double pixelPerInterval = 40}) {
   final allowedCount = axisViewSize ~/ pixelPerInterval;
   final accurateInterval = diffInYAxis / allowedCount;
   return _roundInterval(accurateInterval).toDouble();
@@ -133,6 +160,7 @@ int _roundInterval(double input) {
 }
 
 /// billion number
+/// in short scale (https://en.wikipedia.org/wiki/Billion)
 const double billion = 1000000000;
 
 /// million number
@@ -180,4 +208,17 @@ String formatNumber(double number) {
   }
 
   return resultNumber + symbol;
+}
+
+/// Returns a TextStyle based on provided [context], if [providedStyle] provided we try to merge it.
+TextStyle getThemeAwareTextStyle(BuildContext context, TextStyle? providedStyle) {
+  final defaultTextStyle = DefaultTextStyle.of(context);
+  var effectiveTextStyle = providedStyle;
+  if (providedStyle == null || providedStyle.inherit) {
+    effectiveTextStyle = defaultTextStyle.style.merge(providedStyle);
+  }
+  if (MediaQuery.boldTextOverride(context)) {
+    effectiveTextStyle = effectiveTextStyle!.merge(const TextStyle(fontWeight: FontWeight.bold));
+  }
+  return effectiveTextStyle ??= defaultTextStyle.style;
 }

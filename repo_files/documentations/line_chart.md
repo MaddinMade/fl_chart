@@ -6,10 +6,15 @@
 ```dart
 LineChart(
   LineChartData(
-    // read about it in the below section
+    // read about it in the LineChartData section
   ),
+  swapAnimationDuration: Duration(milliseconds: 150), // Optional
+  swapAnimationCurve: Curves.linear, // Optional
 );
 ```
+
+### Implicit Animations 
+When you change the chart's state, it animates to the new state internally (using [implicit animations](https://flutter.dev/docs/development/ui/animations/implicit-animations)). You can control the animation [duration](https://api.flutter.dev/flutter/dart-core/Duration-class.html) and [curve](https://api.flutter.dev/flutter/animation/Curves-class.html) using optional `swapAnimationDuration` and `swapAnimationCurve` properties, respectively.
 
 ### LineChartData
 |PropName		|Description	|default value|
@@ -21,7 +26,7 @@ LineChart(
 |extraLinesData| [ExtraLinesData](#ExtraLinesData) object to hold drawing details of extra horizontal and vertical lines.|
 |lineTouchData| [LineTouchData](#linetouchdata-read-about-touch-handling) holds the touch interactivity details| LineTouchData()|
 |rangeAnnotations| show range annotations behind the chart, check [RangeAnnotations](base_chart.md#RangeAnnotations) | RangeAnnotations()|
-|showingTooltipIndicators| show the tooltip based on provided position(x), and list of [LineBarSpot](#LineBarSpot)| [] |
+|showingTooltipIndicators| show the tooltip based on provided list of [LineBarSpot](#LineBarSpot)| [] |
 |gridData| check the [FlGridData](base_chart.md#FlGridData)|FlGridData()|
 |borderData| check the [FlBorderData](base_chart.md#FlBorderData)|FlBorderData()|
 |minX| gets minimum x of x axis, if null, value will read from the input lineBars |null|
@@ -160,12 +165,14 @@ LineChart(
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |enabled|determines to enable or disable touch behaviors|true|
+|mouseCursorResolver|you can change the mouse cursor based on the provided [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [LineTouchResponse](#LineTouchResponse)|MouseCursor.defer|
 |touchTooltipData|a [LineTouchTooltipData](#LineTouchTooltipData), that determines how show the tooltip on top of touched spots (appearance of the showing tooltip bubble)|LineTouchTooltipData|
 |getTouchedSpotIndicator| a callback that retrieves list of [TouchedSpotIndicatorData](#TouchedSpotIndicatorData) by the given list of [LineBarSpot](#LineBarSpot) for showing the indicators on touched spots|defaultTouchedIndicators|
 |touchSpotThreshold|the threshold of the touch accuracy|10|
 |handleBuiltInTouches| set this true if you want the built in touch handling (show a tooltip bubble and an indicator on touched spots) | true|
-|fullHeightTouchLine| set `true` to show the line in full height mode | false|
-|touchCallback| listen to this callback to retrieve touch events, it gives you a [LineTouchResponse](#LineTouchResponse)| null|
+|getTouchLineStart| controls where the line starts, default is bottom of the chart| defaultGetTouchLineStart|
+|getTouchLineEnd| controls where the line ends, default is the touch point| defaultGetTouchLineEnd|
+|touchCallback| listen to this callback to retrieve touch/pointer events and responses, it gives you a [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [LineTouchResponse](#LineTouchResponse)| null|
 
 
 ### LineTouchTooltipData
@@ -174,7 +181,7 @@ LineChart(
  |tooltipBgColor|background color of the tooltip bubble|Colors.white|
  |tooltipRoundedRadius|background corner radius of the tooltip bubble|4|
  |tooltipPadding|padding of the tooltip|EdgeInsets.symmetric(horizontal: 16, vertical: 8)|
- |tooltipBottomMargin|bottom margin of the tooltip (to the top of most top spot)|16|
+ |tooltipMargin|margin between the tooltip and the touched spot|16|
  |maxContentWidth|maximum width of the tooltip (if a text row is wider than this, then the text breaks to a new line|120|
  |getTooltipItems|a callback that retrieve list of [LineTooltipItem](#LineTooltipItem) by the given list of [LineBarSpot](#LineBarSpot) |defaultLineTooltipItem|
  |fitInsideHorizontally| forces tooltip to horizontally shift inside the chart's bounding box| false|
@@ -186,6 +193,9 @@ LineChart(
 |:-------|:----------|:------------|
 |text|text string of each row in the tooltip bubble|null|
 |textStyle|[TextStyle](https://api.flutter.dev/flutter/dart-ui/TextStyle-class.html) of the showing text row|null|
+|textAlign|[TextStyle](https://api.flutter.dev/flutter/dart-ui/TextAlign-class.html) of the showing text row|TextAlign.center|
+|textDirection|[TextDirection](https://api.flutter.dev/flutter/dart-ui/TextDirection-class.html) of the showing text row|TextDirection.ltr|
+|children|[List<TextSpan>](https://api.flutter.dev/flutter/painting/InlineSpan-class.html) pass additional InlineSpan children for a more advance tooltip|null|
 
 ### TouchedSpotIndicatorData
 |PropName|Description|default value|
@@ -203,16 +213,13 @@ LineChart(
 
 
 ### LineTouchResponse
-###### you can listen to touch behaviors stream and retrieve this object when any touch action happend.
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |lineBarSpots|a list of [LineBarSpot](#LineBarSpot)|null|
-|touchInput|a [FlTouchInput](base_chart.md#FlTouchInput) that is the touch behaviour|null|
 
 ### ShowingTooltipIndicators
 |PropName|Description|default value|
 |:-------|:----------|:------------|
-|lineIndex|Determines in which line these tooltips should be shown.|null|
 |showingSpots|Determines the spots that each tooltip should be shown.|null|
 
 
@@ -252,3 +259,9 @@ LineChart(
 
 ##### Sample 8 ([Source Code](/example/lib/line_chart/samples/line_chart_sample8.dart))
 <img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/line_chart/line_chart_sample_8.png" width="300" >
+
+##### Sample 9 ([Source Code](/example/lib/line_chart/samples/line_chart_sample9.dart))
+<img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/line_chart/line_chart_sample_9.gif" width="300" >
+
+##### Sample 10 ([Source Code](/example/lib/line_chart/samples/line_chart_sample10.dart))
+<img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/line_chart/line_chart_sample_10.gif" width="300" >

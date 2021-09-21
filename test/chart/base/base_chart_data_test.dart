@@ -24,27 +24,5 @@ void main() {
               ),
           false);
     });
-
-    test('FlTouchData equality test', () {
-      expect(touchData1 == touchData2, true);
-
-      expect(
-          touchData1 ==
-              FlTouchData(
-                true,
-              ),
-          false);
-    });
-
-    test('BaseTouchResponse equality test', () {
-      expect(baseTouchResponse1 == baseTouchResponse2, true);
-
-      expect(
-          baseTouchResponse1 ==
-              BaseTouchResponse(
-                FlPanStart(const Offset(0.0, 1.0)),
-              ),
-          false);
-    });
   });
 }

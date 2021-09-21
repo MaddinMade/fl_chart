@@ -1,9 +1,8 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:fl_chart/src/chart/base/base_chart/touch_input.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/utils/lerp.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../base/base_chart/base_chart_data.dart';
@@ -58,12 +57,13 @@ class PieChartData extends BaseChartData with EquatableMixin {
   })  : sections = sections ?? const [],
         centerSpaceRadius = centerSpaceRadius ?? double.infinity,
         centerSpaceColor = centerSpaceColor ?? Colors.transparent,
-
-        /// we've disabled `groupSpace` on web, because some BlendModes are [not working](https://github.com/flutter/flutter/issues/56071) yet
-        sectionsSpace = kIsWeb ? 0 : sectionsSpace ?? 2,
+        sectionsSpace = sectionsSpace ?? 2,
         startDegreeOffset = startDegreeOffset ?? 0,
         pieTouchData = pieTouchData ?? PieTouchData(),
-        super(borderData: borderData, touchData: pieTouchData ?? PieTouchData());
+        super(
+          borderData: borderData ?? FlBorderData(show: false),
+          touchData: pieTouchData ?? PieTouchData(),
+        );
 
   /// Copies current [PieChartData] to a new [PieChartData],
   /// and replaces provided values.
@@ -94,7 +94,7 @@ class PieChartData extends BaseChartData with EquatableMixin {
       return PieChartData(
         borderData: FlBorderData.lerp(a.borderData, b.borderData, t),
         centerSpaceColor: Color.lerp(a.centerSpaceColor, b.centerSpaceColor, t),
-        centerSpaceRadius: lerpDouble(a.centerSpaceRadius, b.centerSpaceRadius, t),
+        centerSpaceRadius: lerpDoubleAllowInfinity(a.centerSpaceRadius, b.centerSpaceRadius, t),
         pieTouchData: b.pieTouchData,
         sectionsSpace: lerpDouble(a.sectionsSpace, b.sectionsSpace, t),
         startDegreeOffset: lerpDouble(a.startDegreeOffset, b.startDegreeOffset, t),
@@ -119,11 +119,13 @@ class PieChartData extends BaseChartData with EquatableMixin {
 }
 
 /// Holds data related to drawing each [PieChart] section.
-class PieChartSectionData with EquatableMixin {
+class PieChartSectionData {
   /// It determines how much space it should occupy around the circle.
   ///
   /// This is depends on sum of all sections, each section should
   /// occupy ([value] / sumValues) * 360 degrees.
+  ///
+  /// value can not be null.
   final double value;
 
   /// Defines the color of section.
@@ -136,16 +138,19 @@ class PieChartSectionData with EquatableMixin {
   final bool showTitle;
 
   /// Defines style of showing title of section.
-  final TextStyle titleStyle;
+  final TextStyle? titleStyle;
 
   /// Defines text of showing title at the middle of section.
   final String title;
+
+  /// Defines border stroke around the section
+  final BorderSide borderSide;
 
   /// Defines a widget that represents the section.
   ///
   /// This can be anything from a text, an image, an animation, and even a combination of widgets.
   /// Use AnimatedWidgets to animate this widget.
-  final Widget? badgeWidget;
+  final Widget badgeWidget;
 
   /// Defines position of showing title in the section.
   ///
@@ -187,17 +192,18 @@ class PieChartSectionData with EquatableMixin {
     bool? showTitle,
     TextStyle? titleStyle,
     String? title,
+    BorderSide? borderSide,
     Widget? badgeWidget,
     double? titlePositionPercentageOffset,
     double? badgePositionPercentageOffset,
   })  : value = value ?? 10,
-        color = color ?? Colors.red,
+        color = color ?? Colors.cyan,
         radius = radius ?? 40,
         showTitle = showTitle ?? true,
-        titleStyle = titleStyle ??
-            const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-        title = title ?? value.toString(),
-        badgeWidget = badgeWidget,
+        titleStyle = titleStyle,
+        title = title ?? (value == null ? '' : value.toString()),
+        borderSide = borderSide ?? BorderSide(width: 0),
+        badgeWidget = badgeWidget ?? Container(),
         titlePositionPercentageOffset = titlePositionPercentageOffset ?? 0.5,
         badgePositionPercentageOffset = badgePositionPercentageOffset ?? 0.5;
 
@@ -210,6 +216,7 @@ class PieChartSectionData with EquatableMixin {
     bool? showTitle,
     TextStyle? titleStyle,
     String? title,
+    BorderSide? borderSide,
     Widget? badgeWidget,
     double? titlePositionPercentageOffset,
     double? badgePositionPercentageOffset,
@@ -221,6 +228,7 @@ class PieChartSectionData with EquatableMixin {
       showTitle: showTitle ?? this.showTitle,
       titleStyle: titleStyle ?? this.titleStyle,
       title: title ?? this.title,
+      borderSide: borderSide ?? this.borderSide,
       badgeWidget: badgeWidget ?? this.badgeWidget,
       titlePositionPercentageOffset:
           titlePositionPercentageOffset ?? this.titlePositionPercentageOffset,
@@ -238,6 +246,7 @@ class PieChartSectionData with EquatableMixin {
       showTitle: b.showTitle,
       titleStyle: TextStyle.lerp(a.titleStyle, b.titleStyle, t),
       title: b.title,
+      borderSide: BorderSide.lerp(a.borderSide, b.borderSide, t),
       badgeWidget: b.badgeWidget,
       titlePositionPercentageOffset:
           lerpDouble(a.titlePositionPercentageOffset, b.titlePositionPercentageOffset, t),
@@ -245,54 +254,39 @@ class PieChartSectionData with EquatableMixin {
           lerpDouble(a.badgePositionPercentageOffset, b.badgePositionPercentageOffset, t),
     );
   }
-
-  /// Used for equality check, see [EquatableMixin].
-  @override
-  List<Object?> get props => [
-        value,
-        color,
-        radius,
-        showTitle,
-        titleStyle,
-        title,
-        badgeWidget,
-        titlePositionPercentageOffset,
-        badgePositionPercentageOffset,
-      ];
 }
 
 /// Holds data to handle touch events, and touch responses in the [PieChart].
 ///
 /// There is a touch flow, explained [here](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/handle_touches.md)
-/// in a simple way, each chart captures the touch events, and passes a concrete
-/// instance of [FlTouchInput] to the painter, and gets a generated [PieTouchResponse].
-class PieTouchData extends FlTouchData with EquatableMixin {
-  /// you can implement it to receive touches callback
-  final Function(PieTouchResponse)? touchCallback;
-
+/// in a simple way, each chart's renderer captures the touch events, and passes the pointerEvent
+/// to the painter, and gets touched spot, and wraps it into a concrete [PieTouchResponse].
+class PieTouchData extends FlTouchData<PieTouchResponse> with EquatableMixin {
   /// You can disable or enable the touch system using [enabled] flag,
   ///
-  /// You can listen to touch events using [touchCallback],
-  /// It gives you a [PieTouchResponse] that contains some
-  /// useful information about happened touch.
+  /// [touchCallback] notifies you about the happened touch/pointer events.
+  /// It gives you a [FlTouchEvent] which is the happened event such as [FlPointerHoverEvent], [FlTapUpEvent], ...
+  /// It also gives you a [PieTouchResponse] which contains information
+  /// about the elements that has touched.
+  ///
+  /// Using [mouseCursorResolver] you can change the mouse cursor
+  /// based on the provided [FlTouchEvent] and [PieTouchResponse]
   PieTouchData({
     bool? enabled,
-    Function(PieTouchResponse)? touchCallback,
-  })  : touchCallback = touchCallback,
-        super(enabled ?? true);
+    BaseTouchCallback<PieTouchResponse>? touchCallback,
+    MouseCursorResolver<PieTouchResponse>? mouseCursorResolver,
+  }) : super(enabled ?? true, touchCallback, mouseCursorResolver);
 
   /// Used for equality check, see [EquatableMixin].
   @override
   List<Object?> get props => [
         enabled,
+        touchCallback,
+        mouseCursorResolver,
       ];
 }
 
-/// Holds information about touch response in the [PieChart].
-///
-/// You can override [PieTouchData.touchCallback] to handle touch events,
-/// it gives you a [PieTouchResponse] and you can do whatever you want.
-class PieTouchResponse extends BaseTouchResponse with EquatableMixin {
+class PieTouchedSection with EquatableMixin {
   /// touch happened on this section
   final PieChartSectionData? touchedSection;
 
@@ -305,23 +299,19 @@ class PieTouchResponse extends BaseTouchResponse with EquatableMixin {
   /// touch happened with this radius on the [PieChart]
   final double touchRadius;
 
-  /// If touch happens, [PieChart] processes it internally and passes out a [PieTouchResponse]
-  /// that contains [touchedSection], [touchedSectionIndex] that tells
+  /// This class Contains [touchedSection], [touchedSectionIndex] that tells
   /// you touch happened on which section,
   /// [touchAngle] gives you angle of touch,
   /// and [touchRadius] gives you radius of the touch.
-  /// [touchInput] is the type of happened touch.
-  PieTouchResponse(
+  PieTouchedSection(
     PieChartSectionData? touchedSection,
     int touchedSectionIndex,
     double touchAngle,
     double touchRadius,
-    FlTouchInput touchInput,
   )   : touchedSection = touchedSection,
         touchedSectionIndex = touchedSectionIndex,
         touchAngle = touchAngle,
-        touchRadius = touchRadius,
-        super(touchInput);
+        touchRadius = touchRadius;
 
   /// Used for equality check, see [EquatableMixin].
   @override
@@ -330,8 +320,31 @@ class PieTouchResponse extends BaseTouchResponse with EquatableMixin {
         touchedSectionIndex,
         touchAngle,
         touchRadius,
-        touchInput,
       ];
+}
+
+/// Holds information about touch response in the [PieChart].
+///
+/// You can override [PieTouchData.touchCallback] to handle touch events,
+/// it gives you a [PieTouchResponse] and you can do whatever you want.
+class PieTouchResponse extends BaseTouchResponse {
+  /// Contains information about touched section, like index, angle, radius, ...
+  final PieTouchedSection? touchedSection;
+
+  /// If touch happens, [PieChart] processes it internally and passes out a [PieTouchResponse]
+  PieTouchResponse(PieTouchedSection? touchedSection)
+      : touchedSection = touchedSection,
+        super();
+
+  /// Copies current [PieTouchResponse] to a new [PieTouchResponse],
+  /// and replaces provided values.
+  PieTouchResponse copyWith({
+    PieTouchedSection? touchedSection,
+  }) {
+    return PieTouchResponse(
+      touchedSection ?? this.touchedSection,
+    );
+  }
 }
 
 /// It lerps a [PieChartData] to another [PieChartData] (handles animation for updating values)

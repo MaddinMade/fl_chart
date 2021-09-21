@@ -6,10 +6,15 @@
 ```dart
 ScatterChart(
   ScatterChartData(
-    // read about it in the below section
+    // read about it in the ScatterChartData section
   ),
+  swapAnimationDuration: Duration(milliseconds: 150), // Optional
+  swapAnimationCurve: Curves.linear, // Optional
 );
 ```
+
+### Implicit Animations
+When you change the chart's state, it animates to the new state internally (using [implicit animations](https://flutter.dev/docs/development/ui/animations/implicit-animations)). You can control the animation [duration](https://api.flutter.dev/flutter/dart-core/Duration-class.html) and [curve](https://api.flutter.dev/flutter/animation/Curves-class.html) using optional `swapAnimationDuration` and `swapAnimationCurve` properties, respectively.
 
 ### ScatterChartData
 |PropName		|Description	|default value|
@@ -34,11 +39,11 @@ ScatterChart(
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |enabled|determines to enable or disable touch behaviors|true|
+|mouseCursorResolver|you can change the mouse cursor based on the provided [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [ScatterTouchResponse](#ScatterTouchResponse)|MouseCursor.defer|
 |touchTooltipData|a [ScatterTouchTooltipData](#ScatterTouchTooltipData), that determines how show the tooltip on top of touched spot (appearance of the showing tooltip bubble)|ScatterTouchTooltipData()|
-|touchSpotThreshold|the threshold of the touch accuracy|10|
+|touchSpotThreshold|the threshold of the touch accuracy|0|
 |handleBuiltInTouches| set this true if you want the built in touch handling (show a tooltip bubble and an indicator on touched spots) | true|
-|touchCallback| listen to this callback to retrieve touch events, it gives you a [ScatterTouchResponse](#ScatterTouchResponse)| null|
-
+|touchCallback| listen to this callback to retrieve touch/pointer events and responses, it gives you a [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [ScatterTouchResponse](#ScatterTouchResponse)| null|
 
 ### ScatterTouchTooltipData
 |PropName|Description|default value|
@@ -56,17 +61,22 @@ ScatterChart(
 |:-------|:----------|:------------|
 |text|text string of each row in the tooltip bubble|null|
 |textStyle|[TextStyle](https://api.flutter.dev/flutter/dart-ui/TextStyle-class.html) of the showing text row|null|
-|bottomMargin| bottom margin of the tooltip (to the top of most top spot) | radius / 2|
+|textDirection|[TextDirection](https://api.flutter.dev/flutter/dart-ui/TextDirection-class.html) of the showing text row|TextDirection.ltr|
+|bottomMargin| bottom margin of the tooltip (to the top of most top spot) | 0|
+|children|[List<TextSpan>](https://api.flutter.dev/flutter/painting/InlineSpan-class.html) pass additional InlineSpan children for a more advance tooltip|null|
 
 
 ### ScatterTouchResponse
 ###### you can listen to touch behaviors callback and retrieve this object when any touch action happened.
 |PropName|Description|default value|
 |:-------|:----------|:------------|
-|touchedSpot|touched [ScatterSpot](#ScatterSpot)|null|
-|touchedSpotIndex|index of touched [ScatterSpot](#ScatterSpot)|null|
-|touchInput|a [FlTouchInput](base_chart.md#FlTouchInput) that is the touch behaviour|null|
+|touchedSpot|Instance of [ScatterTouchedSpot](#ScatterTouchedSpot) which holds data about the touched section|null|
 
+### ScatterTouchedSpot
+|PropName|Description|default value|
+|:-------|:----------|:------------|
+|spot|touched [ScatterSpot](#ScatterSpot)|null|
+|spotIndex|index of touched [ScatterSpot](#ScatterSpot)|null|
 
 ### some samples
 ----

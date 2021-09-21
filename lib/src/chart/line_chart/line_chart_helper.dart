@@ -21,17 +21,18 @@ class LineChartHelper {
       return _cachedResults[listWrapper]!.copyWith(readFromCache: true);
     }
 
-    for (var i = 0; i < lineBarsData.length; i++) {
-      final lineBarChart = lineBarsData[i];
-      if (lineBarChart.spots.isEmpty) {
-        throw Exception('spots could not be null or empty');
-      }
+    final LineChartBarData lineBarData;
+    try {
+      lineBarData = lineBarsData.firstWhere((element) => element.spots.isNotEmpty);
+    } catch (e) {
+      // There is no lineBarData with at least one spot
+      return LineChartMinMaxAxisValues(0, 0, 0, 0);
     }
 
-    var minX = lineBarsData[0].spots[0].x;
-    var maxX = lineBarsData[0].spots[0].x;
-    var minY = lineBarsData[0].spots[0].y;
-    var maxY = lineBarsData[0].spots[0].y;
+    var minX = lineBarData.spots[0].x;
+    var maxX = lineBarData.spots[0].x;
+    var minY = lineBarData.spots[0].y;
+    var maxY = lineBarData.spots[0].y;
 
     for (var i = 0; i < lineBarsData.length; i++) {
       final barData = lineBarsData[i];
@@ -103,11 +104,15 @@ extension LineChartDataExtension on LineChartBarData {
   List<double> getSafeColorStops() {
     var stops = <double>[];
     if (colorStops == null || colorStops!.length != colors.length) {
-      /// provided colorStops is invalid and we calculate it here
-      colors.asMap().forEach((index, color) {
-        final percent = 1.0 / colors.length;
-        stops.add(percent * index);
-      });
+      if (colors.length > 1) {
+        /// provided colorStops is invalid and we calculate it here
+        colors.asMap().forEach((index, color) {
+          final percent = 1.0 / (colors.length - 1);
+          stops.add(percent * index);
+        });
+      } else {
+        throw ArgumentError('"colors" must have length > 1.');
+      }
     } else {
       stops = colorStops!;
     }
@@ -124,11 +129,15 @@ extension BarAreaDataExtension on BarAreaData {
   List<double> getSafeColorStops() {
     var stops = <double>[];
     if (gradientColorStops == null || gradientColorStops!.length != colors.length) {
-      /// provided colorStops is invalid and we calculate it here
-      colors.asMap().forEach((index, color) {
-        final percent = 1.0 / colors.length;
-        stops.add(percent * index);
-      });
+      if (colors.length > 1) {
+        /// provided colorStops is invalid and we calculate it here
+        colors.asMap().forEach((index, color) {
+          final percent = 1.0 / (colors.length - 1);
+          stops.add(percent * index);
+        });
+      } else {
+        throw ArgumentError('"colors" must have length > 1.');
+      }
     } else {
       stops = gradientColorStops!;
     }
@@ -145,11 +154,15 @@ extension BetweenBarsDataExtension on BetweenBarsData {
   List<double> getSafeColorStops() {
     var stops = <double>[];
     if (gradientColorStops == null || gradientColorStops!.length != colors.length) {
-      /// provided colorStops is invalid and we calculate it here
-      colors.asMap().forEach((index, color) {
-        final percent = 1.0 / colors.length;
-        stops.add(percent * index);
-      });
+      if (colors.length > 1) {
+        /// provided colorStops is invalid and we calculate it here
+        colors.asMap().forEach((index, color) {
+          final percent = 1.0 / (colors.length - 1);
+          stops.add(percent * index);
+        });
+      } else {
+        throw ArgumentError('"colors" must have length > 1.');
+      }
     } else {
       stops = gradientColorStops!;
     }

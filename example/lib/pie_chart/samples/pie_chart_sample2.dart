@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-
 import 'indicator.dart';
 
 class PieChartSample2 extends StatefulWidget {
@@ -9,7 +8,7 @@ class PieChartSample2 extends StatefulWidget {
 }
 
 class PieChart2State extends State {
-  int touchedIndex;
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +26,16 @@ class PieChart2State extends State {
                 aspectRatio: 1,
                 child: PieChart(
                   PieChartData(
-                      pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+                      pieTouchData:
+                          PieTouchData(touchCallback: (FlTouchEvent event, pieTouchResponse) {
                         setState(() {
-                          if (pieTouchResponse.touchInput is FlLongPressEnd ||
-                              pieTouchResponse.touchInput is FlPanEnd) {
+                          if (!event.isInterestedForInteractions ||
+                              pieTouchResponse == null ||
+                              pieTouchResponse.touchedSection == null) {
                             touchedIndex = -1;
-                          } else {
-                            touchedIndex = pieTouchResponse.touchedSectionIndex;
+                            return;
                           }
+                          touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
                         });
                       }),
                       borderData: FlBorderData(
@@ -97,8 +98,8 @@ class PieChart2State extends State {
   List<PieChartSectionData> showingSections() {
     return List.generate(4, (i) {
       final isTouched = i == touchedIndex;
-      final double fontSize = isTouched ? 25 : 16;
-      final double radius = isTouched ? 60 : 50;
+      final fontSize = isTouched ? 25.0 : 16.0;
+      final radius = isTouched ? 60.0 : 50.0;
       switch (i) {
         case 0:
           return PieChartSectionData(
@@ -137,7 +138,7 @@ class PieChart2State extends State {
                 fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
           );
         default:
-          return null;
+          throw Error();
       }
     });
   }

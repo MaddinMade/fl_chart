@@ -93,9 +93,16 @@ void main() {
       expect(radarDataSet1 == radarDataSet2, false);
 
       expect(
-          radarDataSet1 == radarDataSet1Clone.copyWith(dataEntries: [RadarEntry(value: 5)]), false);
-
-      expect(radarDataSet1 == radarDataSet1Clone.copyWith(dataEntries: []), false);
+        radarDataSet1 ==
+            radarDataSet1Clone.copyWith(
+              dataEntries: [
+                RadarEntry(value: 5),
+                RadarEntry(value: 5),
+                RadarEntry(value: 5),
+              ],
+            ),
+        false,
+      );
 
       expect(radarDataSet1 == radarDataSet1Clone.copyWith(fillColor: Colors.grey), true);
 
@@ -145,38 +152,10 @@ void main() {
           radarTouchData1 ==
               RadarTouchData(
                 enabled: true,
-                touchCallback: (value) {},
+                touchCallback: (event, value) {},
                 touchSpotThreshold: 12,
               ),
           false);
-    });
-
-    test('RadarTouchResponse equality test', () {
-      final sample1 = RadarTouchResponse(
-        radarTouchedSpot1,
-        FlPanStart(const Offset(0, 1)),
-      );
-
-      RadarTouchResponse changed = RadarTouchResponse(
-        radarTouchedSpot1,
-        FlPanStart(const Offset(0, 1)),
-      );
-
-      expect(sample1 == changed, true);
-
-      changed = RadarTouchResponse(
-        radarTouchedSpot2,
-        FlPanStart(const Offset(0, 1)),
-      );
-
-      expect(sample1 == changed, false);
-
-      changed = RadarTouchResponse(
-        radarTouchedSpot1,
-        FlPanStart(const Offset(1, 1)),
-      );
-
-      expect(sample1 == changed, false);
     });
 
     test('RadarTouchedSpot equality test', () {
