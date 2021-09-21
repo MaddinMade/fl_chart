@@ -9,14 +9,15 @@ import 'line_chart_renderer.dart';
 class LineChart extends ImplicitlyAnimatedWidget {
   /// Determines how the [LineChart] should be look like.
   final LineChartData data;
+  final bool longPressInScrollable;
 
   /// [data] determines how the [LineChart] should be look like,
   /// when you make any change in the [LineChartData], it updates
   /// new values with animation, and duration is [swapAnimationDuration].
   /// also you can change the [swapAnimationCurve]
   /// which default is [Curves.linear].
-  const LineChart(
-    this.data, {
+  const LineChart(this.data, {
+    this.longPressInScrollable = true,
     Duration swapAnimationDuration = const Duration(milliseconds: 150),
     Curve swapAnimationCurve = Curves.linear,
   }) : super(duration: swapAnimationDuration, curve: swapAnimationCurve);
@@ -46,6 +47,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     return LineChartLeaf(
       data: _withTouchedIndicators(_lineChartDataTween!.evaluate(animation)),
       targetData: _withTouchedIndicators(showingData),
+      drag: !widget.longPressInScrollable,
     );
   }
 
@@ -110,7 +112,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     _lineChartDataTween = visitor(
       _lineChartDataTween,
       _getData(),
-      (dynamic value) => LineChartDataTween(begin: value, end: widget.data),
+          (dynamic value) => LineChartDataTween(begin: value, end: widget.data),
     ) as LineChartDataTween;
   }
 }

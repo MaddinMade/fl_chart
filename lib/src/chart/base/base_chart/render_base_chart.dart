@@ -11,14 +11,17 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
     implements MouseTrackerAnnotation {
   /// We use [FlTouchData] to retrieve [FlTouchData.touchCallback] and [FlTouchData.mouseCursorResolver]
   /// to invoke them when touch happens.
-  RenderBaseChart(FlTouchData<R>? touchData, BuildContext context) : _buildContext = context {
+  RenderBaseChart(FlTouchData<R>? touchData, BuildContext context, {this.drag = false}) : _buildContext = context {
     updateBaseTouchData(touchData);
     initGestureRecognizers();
   }
 
+  final bool drag;
+
   // We use buildContext to retrieve Theme data
   BuildContext get buildContext => _buildContext;
   BuildContext _buildContext;
+
   set buildContext(BuildContext value) {
     _buildContext = value;
     markNeedsPaint();
@@ -45,15 +48,15 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
   /// Recognizes longPress gestures, such as onLongPressStart, onLongPressMoveUpdate and onLongPressEnd
   late LongPressGestureRecognizer _longPressGestureRecognizer;
 
+  late HorizontalDragGestureRecognizer _horizontalDragGestureRecognizer;
+  late VerticalDragGestureRecognizer _verticalDragGestureRecognizer;
+
   /// Initializes our recognizers and implement their callbacks.
   void initGestureRecognizers() {
     _panGestureRecognizer = PanGestureRecognizer();
-    _panGestureRecognizer.onDown =
-        (dragDownDetails) => _notifyTouchEvent(FlPanDownEvent(dragDownDetails));
-    _panGestureRecognizer.onStart =
-        (dragStartDetails) => _notifyTouchEvent(FlPanStartEvent(dragStartDetails));
-    _panGestureRecognizer.onUpdate =
-        (dragUpdateDetails) => _notifyTouchEvent(FlPanUpdateEvent(dragUpdateDetails));
+    _panGestureRecognizer.onDown = (dragDownDetails) => _notifyTouchEvent(FlPanDownEvent(dragDownDetails));
+    _panGestureRecognizer.onStart = (dragStartDetails) => _notifyTouchEvent(FlPanStartEvent(dragStartDetails));
+    _panGestureRecognizer.onUpdate = (dragUpdateDetails) => _notifyTouchEvent(FlPanUpdateEvent(dragUpdateDetails));
     _panGestureRecognizer.onCancel = () => _notifyTouchEvent(FlPanCancelEvent());
     _panGestureRecognizer.onEnd =
         (dragEndDetails) => _notifyTouchEvent(FlPanEndEvent(dragEndDetails));
@@ -67,10 +70,20 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
     _longPressGestureRecognizer = LongPressGestureRecognizer();
     _longPressGestureRecognizer.onLongPressStart =
         (longPressStartDetails) => _notifyTouchEvent(FlLongPressStart(longPressStartDetails));
-    _longPressGestureRecognizer.onLongPressMoveUpdate = (longPressMoveUpdateDetails) =>
-        _notifyTouchEvent(FlLongPressMoveUpdate(longPressMoveUpdateDetails));
+    _longPressGestureRecognizer.onLongPressMoveUpdate =
+        (longPressMoveUpdateDetails) => _notifyTouchEvent(FlLongPressMoveUpdate(longPressMoveUpdateDetails));
     _longPressGestureRecognizer.onLongPressEnd =
         (longPressEndDetails) => _notifyTouchEvent(FlLongPressEnd(longPressEndDetails));
+
+    _horizontalDragGestureRecognizer = HorizontalDragGestureRecognizer();
+    _horizontalDragGestureRecognizer.onStart = (event) => _notifyTouchEvent(FlHorizontalDragStartEvent(event));
+    _horizontalDragGestureRecognizer.onUpdate = (event) => _notifyTouchEvent(FlHorizontalDragUpdateEvent(event));
+    _horizontalDragGestureRecognizer.onEnd = (event) => _notifyTouchEvent(FlHorizontalDragEndEvent(event));
+
+    _verticalDragGestureRecognizer = VerticalDragGestureRecognizer();
+    _verticalDragGestureRecognizer.onStart = (event) => _notifyTouchEvent(FlVerticalDragStartEvent(event));
+    _verticalDragGestureRecognizer.onUpdate = (event) => _notifyTouchEvent(FlVerticalDragUpdateEvent(event));
+    _verticalDragGestureRecognizer.onEnd = (event) => _notifyTouchEvent(FlVerticalDragEndEvent(event));
   }
 
   @override
@@ -103,6 +116,10 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
       _longPressGestureRecognizer.addPointer(event);
       _tapGestureRecognizer.addPointer(event);
       _panGestureRecognizer.addPointer(event);
+      if(drag) {
+        _horizontalDragGestureRecognizer.addPointer(event);
+        _verticalDragGestureRecognizer.addPointer(event);
+      }
     } else if (event is PointerHoverEvent) {
       _notifyTouchEvent(FlPointerHoverEvent(event));
     }

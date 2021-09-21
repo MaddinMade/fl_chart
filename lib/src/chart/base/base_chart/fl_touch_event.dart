@@ -238,3 +238,61 @@ class FlPointerExitEvent extends FlTouchEvent {
 
   FlPointerExitEvent(this.event);
 }
+
+class FlHorizontalDragStartEvent extends FlTouchEvent {
+  /// Contains information of happened pointer event
+  final DragStartDetails event;
+
+  /// Represents the position of happened touch/pointer event
+  @override
+  Offset get localPosition => event.localPosition;
+
+  FlHorizontalDragStartEvent(this.event);
+}
+
+class FlVerticalDragStartEvent extends FlTouchEvent {
+  /// Contains information of happened pointer event
+  final DragStartDetails event;
+
+  /// Represents the position of happened touch/pointer event
+  @override
+  Offset get localPosition => event.localPosition;
+
+  FlVerticalDragStartEvent(this.event);
+}
+
+class FlHorizontalDragEndEvent extends FlTouchEvent {
+  /// Contains information of happened pointer event
+  final DragEndDetails event;
+
+  FlHorizontalDragEndEvent(this.event);
+}
+
+class FlVerticalDragEndEvent extends FlTouchEvent {
+  /// Contains information of happened pointer event
+  final DragEndDetails event;
+
+  FlVerticalDragEndEvent(this.event);
+}
+
+class FlHorizontalDragUpdateEvent extends FlTouchEvent {
+  /// Contains information of happened pointer event
+  final DragUpdateDetails event;
+
+  /// Represents the position of happened touch/pointer event
+  @override
+  Offset get localPosition => event.localPosition;
+
+  FlHorizontalDragUpdateEvent(this.event);
+}
+
+class FlVerticalDragUpdateEvent extends FlTouchEvent {
+  /// Contains information of happened pointer event
+  final DragUpdateDetails event;
+
+  /// Represents the position of happened touch/pointer event
+  @override
+  Offset get localPosition => event.localPosition;
+
+  FlVerticalDragUpdateEvent(this.event);
+}

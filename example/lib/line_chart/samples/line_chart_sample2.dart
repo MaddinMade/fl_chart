@@ -30,6 +30,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
               padding: const EdgeInsets.only(right: 18.0, left: 12.0, top: 24, bottom: 12),
               child: LineChart(
                 showAvg ? avgData() : mainData(),
+                longPressInScrollable: false,
               ),
             ),
           ),
