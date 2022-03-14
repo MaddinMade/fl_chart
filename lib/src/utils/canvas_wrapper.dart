@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fl_chart/fl_chart.dart';
+import 'package:fl_chart/src/extensions/path_extension.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/cupertino.dart' hide Image;
 
@@ -8,6 +9,7 @@ import 'package:flutter/cupertino.dart' hide Image;
 ///
 /// We wrapped the canvas here, because we needed to write tests for our drawing system.
 /// Now in tests we can verify that these functions called with a specific value.
+@Deprecated('We can use the [Canvas] directly to write unit tests')
 class CanvasWrapper {
   final Canvas canvas;
   final Size size;
@@ -27,7 +29,8 @@ class CanvasWrapper {
   void restore() => canvas.restore();
 
   /// Directly calls [Canvas.clipRect]
-  void clipRect(Rect rect, {ClipOp clipOp = ClipOp.intersect, bool doAntiAlias = true}) =>
+  void clipRect(Rect rect,
+          {ClipOp clipOp = ClipOp.intersect, bool doAntiAlias = true}) =>
       canvas.clipRect(rect, clipOp: clipOp, doAntiAlias: doAntiAlias);
 
   /// Directly calls [Canvas.translate]
@@ -46,7 +49,8 @@ class CanvasWrapper {
   void drawPicture(Picture picture) => canvas.drawPicture(picture);
 
   /// Directly calls [Canvas.drawImage]
-  void drawImage(Image image, Offset offset, Paint paint) => canvas.drawImage(image, offset, paint);
+  void drawImage(Image image, Offset offset, Paint paint) =>
+      canvas.drawImage(image, offset, paint);
 
   /// Directly calls [Canvas.clipPath]
   void clipPath(Path path, {bool doAntiAlias = true}) =>
@@ -56,14 +60,16 @@ class CanvasWrapper {
   void drawRect(Rect rect, Paint paint) => canvas.drawRect(rect, paint);
 
   /// Directly calls [Canvas.drawLine]
-  void drawLine(Offset p1, Offset p2, Paint paint) => canvas.drawLine(p1, p2, paint);
+  void drawLine(Offset p1, Offset p2, Paint paint) =>
+      canvas.drawLine(p1, p2, paint);
 
   /// Directly calls [Canvas.drawCircle]
   void drawCircle(Offset center, double radius, Paint paint) =>
       canvas.drawCircle(center, radius, paint);
 
   /// Directly calls [Canvas.drawCircle]
-  void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter, Paint paint) =>
+  void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter,
+          Paint paint) =>
       canvas.drawArc(rect, startAngle, sweepAngle, useCenter, paint);
 
   /// Paints a text on the [Canvas]
@@ -105,12 +111,22 @@ class CanvasWrapper {
       rotationOffset.dx + drawOffset.dx + size.width / 2,
       rotationOffset.dy + drawOffset.dy + size.height / 2,
     );
-    rotate(radians(angle));
+    rotate(Utils().radians(angle));
     translate(
       -drawOffset.dx - size.width / 2,
       -drawOffset.dy - size.height / 2,
     );
     drawCallback();
     restore();
+  }
+
+  /// Draws a dashed line from passed in offsets
+  void drawDashedLine(
+      Offset from, Offset to, Paint painter, List<int>? dashArray) {
+    var path = Path();
+    path.moveTo(from.dx, from.dy);
+    path.lineTo(to.dx, to.dy);
+    path = path.toDashedPath(dashArray);
+    drawPath(path, painter);
   }
 }

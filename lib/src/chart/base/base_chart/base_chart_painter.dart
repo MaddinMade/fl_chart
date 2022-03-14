@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/src/extensions/paint_extension.dart';
@@ -15,7 +16,8 @@ class BaseChartPainter<D extends BaseChartData> {
   }
 
   // Paints [BaseChartData] into the provided canvas.
-  void paint(BuildContext context, CanvasWrapper canvasWrapper, PaintHolder<D> holder) {
+  void paint(BuildContext context, CanvasWrapper canvasWrapper,
+      PaintHolder<D> holder) {
     _drawViewBorder(context, canvasWrapper, holder.data.borderData, holder);
   }
 
@@ -32,12 +34,14 @@ class BaseChartPainter<D extends BaseChartData> {
     final viewSize = canvasWrapper.size;
     final chartViewSize = getChartUsableDrawSize(viewSize, holder);
 
-    final topLeft = Offset(getLeftOffsetDrawSize(holder), getTopOffsetDrawSize(holder));
-    final topRight =
-        Offset(getLeftOffsetDrawSize(holder) + chartViewSize.width, getTopOffsetDrawSize(holder));
-    final bottomLeft =
-        Offset(getLeftOffsetDrawSize(holder), getTopOffsetDrawSize(holder) + chartViewSize.height);
-    final bottomRight = Offset(getLeftOffsetDrawSize(holder) + chartViewSize.width,
+    final topLeft =
+        Offset(getLeftOffsetDrawSize(holder), getTopOffsetDrawSize(holder));
+    final topRight = Offset(getLeftOffsetDrawSize(holder) + chartViewSize.width,
+        getTopOffsetDrawSize(holder));
+    final bottomLeft = Offset(getLeftOffsetDrawSize(holder),
+        getTopOffsetDrawSize(holder) + chartViewSize.height);
+    final bottomRight = Offset(
+        getLeftOffsetDrawSize(holder) + chartViewSize.width,
         getTopOffsetDrawSize(holder) + chartViewSize.height);
 
     /// Draw Top Line

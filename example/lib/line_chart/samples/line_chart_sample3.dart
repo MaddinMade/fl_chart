@@ -1,11 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 
 class LineChartSample3 extends StatefulWidget {
-  final weekDays = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  final weekDays = const ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-  final List<double> yValues = [1.3, 1, 1.8, 1.5, 2.2, 1.8, 3];
+  final List<double> yValues = const [1.3, 1, 1.8, 1.5, 2.2, 1.8, 3];
+
+  const LineChartSample3({Key? key}) : super(key: key);
 
   @override
   State createState() => _LineChartSample3State();
@@ -31,15 +32,24 @@ class _LineChartSample3State extends State<LineChartSample3> {
           children: const <Widget>[
             Text(
               'Average Line',
-              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
             Text(
               ' and ',
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
             Text(
               'Indicators',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
           ],
         ),
@@ -52,7 +62,8 @@ class _LineChartSample3State extends State<LineChartSample3> {
           child: LineChart(
             LineChartData(
               lineTouchData: LineTouchData(
-                  getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+                  getTouchedSpotIndicator:
+                      (LineChartBarData barData, List<int> spotIndexes) {
                     return spotIndexes.map((spotIndex) {
                       final spot = barData.spots[spotIndex];
                       if (spot.x == 0 || spot.x == 6) {
@@ -90,6 +101,18 @@ class _LineChartSample3State extends State<LineChartSample3> {
                             return null;
                           }
 
+                          TextAlign textAlign;
+                          switch (flSpot.x.toInt()) {
+                            case 1:
+                              textAlign = TextAlign.left;
+                              break;
+                            case 5:
+                              textAlign = TextAlign.right;
+                              break;
+                            default:
+                              textAlign = TextAlign.center;
+                          }
+
                           return LineTooltipItem(
                             '${widget.weekDays[flSpot.x.toInt()]} \n',
                             const TextStyle(
@@ -104,24 +127,26 @@ class _LineChartSample3State extends State<LineChartSample3> {
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
-                              TextSpan(
+                              const TextSpan(
                                 text: ' k ',
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
-                              TextSpan(
+                              const TextSpan(
                                 text: 'calories',
                                 style: TextStyle(
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
                             ],
+                            textAlign: textAlign,
                           );
                         }).toList();
                       }),
-                  touchCallback: (FlTouchEvent event, LineTouchResponse? lineTouch) {
+                  touchCallback:
+                      (FlTouchEvent event, LineTouchResponse? lineTouch) {
                     if (!event.isInterestedForInteractions ||
                         lineTouch == null ||
                         lineTouch.lineBarSpots == null) {
@@ -136,7 +161,7 @@ class _LineChartSample3State extends State<LineChartSample3> {
                       setState(() {
                         touchedValue = -1;
                       });
-                      return null;
+                      return;
                     }
 
                     setState(() {
@@ -274,7 +299,9 @@ class _LineChartSample3State extends State<LineChartSample3> {
                   getTextStyles: (context, value) {
                     final isTouched = value == touchedValue;
                     return TextStyle(
-                      color: isTouched ? Colors.deepOrange : Colors.deepOrange.withOpacity(0.5),
+                      color: isTouched
+                          ? Colors.deepOrange
+                          : Colors.deepOrange.withOpacity(0.5),
                       fontWeight: FontWeight.bold,
                     );
                   },

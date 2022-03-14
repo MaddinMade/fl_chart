@@ -1,3 +1,49 @@
+## 0.46.0
+* **BUGFIX** Fix drawing BetweenBarsArea problem when there are `nullSpots` in fromLine and toLine, #912.
+* **FEATURE** Allow to have vertically grouped BarChart using `fromY` and `toY` properties in [BarChartRodData](https://github.com/imaNNeoFighT/fl_chart/blob/feature/multi-rods-on-bar-chart/repo_files/documentations/bar_chart.md#BarChartRodData) It means you can have a negative and a positive bar chart at the same X location. #334, #875. Check [BarChartSample5](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/bar_chart.md#sample-5-source-code) and [BarChartSample6](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/bar_chart.md#sample-6-source-code.
+* **BREAKING** Renamed `y` property to `toY` in [BarChartRodData](https://github.com/imaNNeoFighT/fl_chart/blob/feature/multi-rods-on-bar-chart/repo_files/documentations/bar_chart.md#BarChartRodData) and [BackgroundBarChartRodData](https://github.com/imaNNeoFighT/fl_chart/blob/feature/multi-rods-on-bar-chart/repo_files/documentations/bar_chart.md#backgroundbarchartroddata) due to the above feature.
+* **BUGFIX** Fix smaller radius bubble hiding behind bigger radius bubble in ScatterChart, #930.
+* **BUGFIX** Fix tooltip text alignment and direction in line chart, #927.
+
+## 0.45.1
+* **IMPORTANT** **Fuck Vladimir Putin**
+* **BUGFIX** Fix `FlSpot.nullSpot` at the first of list bug, #912.
+* **FEATURE** Add `scatterLabelSettings` property in [ScatterChart](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/scatter_chart.md) which lets you to add titles on the spots, #902.
+
+## 0.45.0
+* **BUGFIX** Fix `clipData` implementation in ScatterChart and LineChart, #897.
+* **BUGFIX** Fix PieChart changing sections issue (we have disabled semantics for pieChart badgeWidgets), #861.
+* **BUGFIX** Fix LineChart width smaller width or height lower than 40, #869, #857.
+* **BUGFIX** Allow to show title when axis diff is zero, #842, #879.
+* **IMPROVEMENT** Improve iteration over axis values logic (it solves some minor problems on showing titles when min, max values are below than 1.0).
+* **IMPROVEMENT** Add `baselineX` and `baselineY` property in our axis-based charts, It fixes a problem about `interval` which mentioned in #893 (check [this sample](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/line_chart.md#gist---baselinex-baseliney-sample-source-code).
+* **IMPROVEMENT** Added `distanceCalculator` to `LineTouchData` which is used to calculate the distance between spots and touch events, #716, #261, #892
+* **BREAKING** `LineTouchResponse` response now contains a list of `TouchLineBarSpot` instead of `LineBarSpot`. They are ordered based on their distance to the touch event and also contain that distance.
+
+## 0.41.0
+* **BUGFIX** Fix getNearestTouchedSpot. Previously it returned the first occurrence of a spot within the threshold, and not the nearest, #641, #645.
+* **FEATURE** Add `textAlign` property in the [SideTitles](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#sidetitles), #784.
+* **IMPROVEMENT** Write some unit-tests and enable code coverage reports in our CI
+
+## 0.40.6
+* **IMPROVEMENT** Fix showing zero value in side titles and grid lines when we add negative value. Now we always go through the zero value in each axis, #739.
+* **BUGFIX** Fix example app unsupported operation problem on web, #844.
+
+## 0.40.5
+* **BUGFIX** Fix BarChart empty groups state error, #797.
+* **BUGFIX** Fix drawTooltipOnTop direction minor bug, #815.
+* **BUGFIX** Fix section with zero value problem in PieChart (disabled animation on changing value to zero and from zero), #817
+* **BUGFIX** Fix pie chart stroke problem when adding space between sections (using new approach), #818.
+* **IMPROVEMENT** Fix interval below one, #811
+
+## 0.40.2
+* **IMPROVEMENT** Use 80 characters for code format line-length instead of 100 (because pub.dev works with 80 and decreased our score). 
+
+## 0.40.1
+* **IMPROVEMENT** Fix pub.dev determining web support, #780.
+* **IMPROVEMENT** Implement flutter_lints in the code.
+* **BUGFIX** Fix below/above area data transparency issue, #770.
+
 ## 0.40.0
 * **BUGFIX** Fixed pieChart `centerRadius = double.infinity` problem, #747.c
 * **BREAKING** Charts touchCallback signature has changed to `(FlTouchEvent event, BaseTouchResponse? response)` which [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) determines which touch/pointer event happened (such as `FlTapUpEvent`, `FlPanUpdateEvent`, ...), and BaseTouchResponse gives us the chart response.

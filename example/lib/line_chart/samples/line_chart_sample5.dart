@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class LineChartSample5 extends StatelessWidget {
   final List<int> showIndexes = const [1, 3, 5];
-  final List<FlSpot> allSpots = [
+  final List<FlSpot> allSpots = const [
     FlSpot(0, 1),
     FlSpot(1, 2),
     FlSpot(2, 1.5),
@@ -12,6 +12,8 @@ class LineChartSample5 extends StatelessWidget {
     FlSpot(5, 5),
     FlSpot(6, 8),
   ];
+
+  const LineChartSample5({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +57,14 @@ class LineChartSample5 extends StatelessWidget {
         LineChartData(
           showingTooltipIndicators: showIndexes.map((index) {
             return ShowingTooltipIndicators([
-              LineBarSpot(
-                  tooltipsOnBar, lineBarsData.indexOf(tooltipsOnBar), tooltipsOnBar.spots[index]),
+              LineBarSpot(tooltipsOnBar, lineBarsData.indexOf(tooltipsOnBar),
+                  tooltipsOnBar.spots[index]),
             ]);
           }).toList(),
           lineTouchData: LineTouchData(
             enabled: false,
-            getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+            getTouchedSpotIndicator:
+                (LineChartBarData barData, List<int> spotIndexes) {
               return spotIndexes.map((index) {
                 return TouchedSpotIndicatorData(
                   FlLine(
@@ -69,9 +72,11 @@ class LineChartSample5 extends StatelessWidget {
                   ),
                   FlDotData(
                     show: true,
-                    getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                    getDotPainter: (spot, percent, barData, index) =>
+                        FlDotCirclePainter(
                       radius: 8,
-                      color: lerpGradient(barData.colors, barData.colorStops!, percent / 100),
+                      color: lerpGradient(
+                          barData.colors, barData.colorStops!, percent / 100),
                       strokeWidth: 2,
                       strokeColor: Colors.black,
                     ),
@@ -86,7 +91,8 @@ class LineChartSample5 extends StatelessWidget {
                 return lineBarsSpot.map((lineBarSpot) {
                   return LineTooltipItem(
                     lineBarSpot.y.toString(),
-                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   );
                 }).toList();
               },
@@ -99,6 +105,7 @@ class LineChartSample5 extends StatelessWidget {
               showTitles: false,
             ),
             bottomTitles: SideTitles(
+                interval: 1,
                 showTitles: true,
                 getTitles: (val) {
                   switch (val.toInt()) {
@@ -131,8 +138,10 @@ class LineChartSample5 extends StatelessWidget {
           axisTitleData: FlAxisTitleData(
             rightTitle: AxisTitle(showTitle: true, titleText: 'count'),
             leftTitle: AxisTitle(showTitle: true, titleText: 'count'),
-            topTitle:
-                AxisTitle(showTitle: true, titleText: 'Wall clock', textAlign: TextAlign.left),
+            topTitle: AxisTitle(
+                showTitle: true,
+                titleText: 'Wall clock',
+                textAlign: TextAlign.left),
           ),
           gridData: FlGridData(show: false),
           borderData: FlBorderData(

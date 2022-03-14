@@ -8,11 +8,13 @@ class BarChartHelper {
   /// Contains List of cached results, base on [List<BarChartGroupData>]
   ///
   /// We use it to prevent redundant calculations
-  static final Map<ListWrapper<BarChartGroupData>, BarChartMinMaxAxisValues> _cachedResults = {};
+  static final Map<ListWrapper<BarChartGroupData>, BarChartMinMaxAxisValues>
+      _cachedResults = {};
 
   /// Calculates minY, and maxY based on [barGroups],
   /// returns cached values, to prevent redundant calculations.
-  static BarChartMinMaxAxisValues calculateMaxAxisValues(List<BarChartGroupData> barGroups) {
+  static BarChartMinMaxAxisValues calculateMaxAxisValues(
+      List<BarChartGroupData> barGroups) {
     if (barGroups.isEmpty) {
       return BarChartMinMaxAxisValues(0, 0);
     }
@@ -31,7 +33,7 @@ class BarChartHelper {
       return BarChartMinMaxAxisValues(0, 0);
     }
 
-    var maxY = barGroup.barRods[0].y;
+    var maxY = barGroup.barRods[0].toY;
     var minY = 0.0;
 
     for (var i = 0; i < barGroups.length; i++) {
@@ -39,20 +41,20 @@ class BarChartHelper {
       for (var j = 0; j < barGroup.barRods.length; j++) {
         final rod = barGroup.barRods[j];
 
-        if (rod.y > maxY) {
-          maxY = rod.y;
+        if (rod.toY > maxY) {
+          maxY = rod.toY;
         }
 
-        if (rod.backDrawRodData.show && rod.backDrawRodData.y > maxY) {
-          maxY = rod.backDrawRodData.y;
+        if (rod.backDrawRodData.show && rod.backDrawRodData.toY > maxY) {
+          maxY = rod.backDrawRodData.toY;
         }
 
-        if (rod.y < minY) {
-          minY = rod.y;
+        if (rod.toY < minY) {
+          minY = rod.toY;
         }
 
-        if (rod.backDrawRodData.show && rod.backDrawRodData.y < minY) {
-          minY = rod.backDrawRodData.y;
+        if (rod.backDrawRodData.show && rod.backDrawRodData.toY < minY) {
+          minY = rod.backDrawRodData.toY;
         }
       }
     }
@@ -74,7 +76,8 @@ class BarChartMinMaxAxisValues with EquatableMixin {
   @override
   List<Object?> get props => [minY, maxY, readFromCache];
 
-  BarChartMinMaxAxisValues copyWith({double? minY, double? maxY, bool? readFromCache}) {
+  BarChartMinMaxAxisValues copyWith(
+      {double? minY, double? maxY, bool? readFromCache}) {
     return BarChartMinMaxAxisValues(
       minY ?? this.minY,
       maxY ?? this.maxY,

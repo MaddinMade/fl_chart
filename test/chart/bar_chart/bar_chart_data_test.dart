@@ -31,23 +31,35 @@ void main() {
 
     test('BarChartRodStackItem equality test', () {
       expect(barChartRodStackItem1 == barChartRodStackItem1Clone, true);
-      expect(barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(fromY: 2), false);
-      expect(barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(toY: 2), true);
-      expect(barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(toY: 3), false);
       expect(
-          barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(color: Colors.red), false);
+          barChartRodStackItem1 ==
+              barChartRodStackItem1Clone.copyWith(fromY: 2),
+          false);
       expect(
-          barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(color: Colors.green), true);
+          barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(toY: 2),
+          true);
+      expect(
+          barChartRodStackItem1 == barChartRodStackItem1Clone.copyWith(toY: 3),
+          false);
+      expect(
+          barChartRodStackItem1 ==
+              barChartRodStackItem1Clone.copyWith(color: Colors.red),
+          false);
+      expect(
+          barChartRodStackItem1 ==
+              barChartRodStackItem1Clone.copyWith(color: Colors.green),
+          true);
       expect(barChartRodStackItem1 == barChartRodStackItem2, false);
     });
 
     test('BackgroundBarChartRodData equality test', () {
-      expect(backgroundBarChartRodData1 == backgroundBarChartRodData1Clone, true);
+      expect(
+          backgroundBarChartRodData1 == backgroundBarChartRodData1Clone, true);
       expect(backgroundBarChartRodData1 == backgroundBarChartRodData2, false);
       expect(backgroundBarChartRodData2 == backgroundBarChartRodData3, false);
 
       final changed = BackgroundBarChartRodData(
-        y: 21,
+        toY: 21,
         colors: [Colors.blue],
         show: false,
       );
@@ -55,7 +67,7 @@ void main() {
       expect(backgroundBarChartRodData1 == changed, false);
 
       final changed2 = BackgroundBarChartRodData(
-        y: 22,
+        toY: 22,
         colors: [Colors.blue],
         show: true,
       );

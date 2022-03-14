@@ -2,22 +2,24 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class LineChartSample4 extends StatelessWidget {
+  const LineChartSample4({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     const cutOffYValue = 5.0;
-    const dateTextStyle =
-        TextStyle(fontSize: 10, color: Colors.purple, fontWeight: FontWeight.bold);
+    const dateTextStyle = TextStyle(
+        fontSize: 10, color: Colors.purple, fontWeight: FontWeight.bold);
 
     return AspectRatio(
       aspectRatio: 2.4,
       child: Padding(
-        padding: EdgeInsets.only(left: 12, right: 24),
+        padding: const EdgeInsets.only(left: 12, right: 24),
         child: LineChart(
           LineChartData(
             lineTouchData: LineTouchData(enabled: false),
             lineBarsData: [
               LineChartBarData(
-                spots: [
+                spots: const [
                   FlSpot(0, 4),
                   FlSpot(1, 3.5),
                   FlSpot(2, 4.5),
@@ -101,10 +103,11 @@ class LineChartSample4 extends StatelessWidget {
                     return '\$ ${value + 0.5}';
                   },
                   getTextStyles: (context, value) =>
-                      TextStyle(color: Colors.black, fontSize: 12.0)),
+                      const TextStyle(color: Colors.black, fontSize: 12.0)),
             ),
             axisTitleData: FlAxisTitleData(
-                leftTitle: AxisTitle(showTitle: true, titleText: 'Value', margin: 4),
+                leftTitle:
+                    AxisTitle(showTitle: true, titleText: 'Value', margin: 4),
                 bottomTitle: AxisTitle(
                     showTitle: true,
                     margin: 0,

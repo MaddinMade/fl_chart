@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
@@ -5,7 +6,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_data.dart';
 import 'package:fl_chart/src/utils/lerp.dart';
-import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// This is the base class for axis base charts data
@@ -19,8 +19,8 @@ abstract class AxisChartData extends BaseChartData with EquatableMixin {
   final FlAxisTitleData axisTitleData;
   final RangeAnnotations rangeAnnotations;
 
-  double minX, maxX;
-  double minY, maxY;
+  double minX, maxX, baselineX;
+  double minY, maxY, baselineY;
 
   /// clip the chart to the border (prevent draw outside the border)
   FlClipData clipData;
@@ -34,20 +34,16 @@ abstract class AxisChartData extends BaseChartData with EquatableMixin {
   /// Difference of [maxX] and [minX]
   double get horizontalDiff => maxX - minX;
 
-  /// Returns true if [minX] and [maxX] both are zero
-  bool get isHorizontalMinMaxIsZero => minX == 0 && maxX == 0;
-
-  /// Returns true if [minY] and [maxY] both are zero
-  bool get isVerticalMinMaxIsZero => minY == 0 && maxY == 0;
-
   AxisChartData({
     FlGridData? gridData,
     required FlAxisTitleData axisTitleData,
     RangeAnnotations? rangeAnnotations,
     required double minX,
     required double maxX,
+    double? baselineX,
     required double minY,
     required double maxY,
+    double? baselineY,
     FlClipData? clipData,
     Color? backgroundColor,
     FlBorderData? borderData,
@@ -57,8 +53,10 @@ abstract class AxisChartData extends BaseChartData with EquatableMixin {
         rangeAnnotations = rangeAnnotations ?? RangeAnnotations(),
         minX = minX,
         maxX = maxX,
+        baselineX = baselineX ?? 0,
         minY = minY,
         maxY = maxY,
+        baselineY = baselineY ?? 0,
         clipData = clipData ?? FlClipData.none(),
         backgroundColor = backgroundColor ?? Colors.transparent,
         super(borderData: borderData, touchData: touchData);
@@ -71,8 +69,10 @@ abstract class AxisChartData extends BaseChartData with EquatableMixin {
         rangeAnnotations,
         minX,
         maxX,
+        baselineX,
         minY,
         maxY,
+        baselineY,
         clipData,
         backgroundColor,
         borderData,
@@ -252,10 +252,13 @@ class FlTitlesData with EquatableMixin {
     SideTitles? rightTitles,
     SideTitles? bottomTitles,
   })  : show = show ?? true,
-        leftTitles = leftTitles ?? SideTitles(reservedSize: 40, showTitles: true),
+        leftTitles =
+            leftTitles ?? SideTitles(reservedSize: 40, showTitles: true),
         topTitles = topTitles ?? SideTitles(reservedSize: 6, showTitles: true),
-        rightTitles = rightTitles ?? SideTitles(reservedSize: 40, showTitles: true),
-        bottomTitles = bottomTitles ?? SideTitles(reservedSize: 6, showTitles: true);
+        rightTitles =
+            rightTitles ?? SideTitles(reservedSize: 40, showTitles: true),
+        bottomTitles =
+            bottomTitles ?? SideTitles(reservedSize: 6, showTitles: true);
 
   /// Lerps a [FlTitlesData] based on [t] value, check [Tween.lerp].
   static FlTitlesData lerp(FlTitlesData a, FlTitlesData b, double t) {
@@ -298,18 +301,15 @@ class FlTitlesData with EquatableMixin {
 }
 
 /// Determines showing or hiding specified title.
-typedef CheckToShowTitle = bool Function(
-    double minValue, double maxValue, SideTitles sideTitles, double appliedInterval, double value);
+typedef CheckToShowTitle = bool Function(double minValue, double maxValue,
+    SideTitles sideTitles, double appliedInterval, double value);
 
-/// The default [SideTitles.checkToShowTitle] function.
+/// The default [SideTitles.checkToShowTitle] function (shows all titles).
 ///
 /// It determines showing or not showing specific title.
-bool defaultCheckToShowTitle(
-    double minValue, double maxValue, SideTitles sideTitles, double appliedInterval, double value) {
-  if ((maxValue - minValue) % appliedInterval == 0) {
-    return true;
-  }
-  return value != maxValue;
+bool defaultCheckToShowTitle(double minValue, double maxValue,
+    SideTitles sideTitles, double appliedInterval, double value) {
+  return true;
 }
 
 /// Holds data for showing each side titles (a title per each axis value).
@@ -322,6 +322,7 @@ class SideTitles with EquatableMixin {
   final double margin;
   final double? interval;
   final double rotateAngle;
+  final TextAlign textAlign;
   final CheckToShowTitle checkToShowTitle;
 
   /// It draws some title on all axis, per each axis value,
@@ -354,6 +355,7 @@ class SideTitles with EquatableMixin {
     double? margin,
     double? interval,
     double? rotateAngle,
+    TextAlign? textAlign,
     CheckToShowTitle? checkToShowTitle,
   })  : showTitles = showTitles ?? false,
         getTitles = getTitles ?? defaultGetTitle,
@@ -363,6 +365,7 @@ class SideTitles with EquatableMixin {
         margin = margin ?? 6,
         interval = interval,
         rotateAngle = rotateAngle ?? 0.0,
+        textAlign = textAlign ?? TextAlign.center,
         checkToShowTitle = checkToShowTitle ?? defaultCheckToShowTitle {
     if (interval == 0) {
       throw ArgumentError("SideTitles.interval couldn't be zero");
@@ -380,6 +383,7 @@ class SideTitles with EquatableMixin {
       margin: lerpDouble(a.margin, b.margin, t),
       interval: lerpDouble(a.interval, b.interval, t),
       rotateAngle: lerpDouble(a.rotateAngle, b.rotateAngle, t),
+      textAlign: b.textAlign,
       checkToShowTitle: b.checkToShowTitle,
     );
   }
@@ -395,6 +399,7 @@ class SideTitles with EquatableMixin {
     double? margin,
     double? interval,
     double? rotateAngle,
+    TextAlign? textAlign,
     CheckToShowTitle? checkToShowTitle,
   }) {
     return SideTitles(
@@ -406,6 +411,7 @@ class SideTitles with EquatableMixin {
       margin: margin ?? this.margin,
       interval: interval ?? this.interval,
       rotateAngle: rotateAngle ?? this.rotateAngle,
+      textAlign: textAlign,
       checkToShowTitle: checkToShowTitle ?? this.checkToShowTitle,
     );
   }
@@ -420,6 +426,7 @@ class SideTitles with EquatableMixin {
         margin,
         interval,
         rotateAngle,
+        textAlign,
         checkToShowTitle,
       ];
 }
@@ -434,7 +441,7 @@ class FlSpot with EquatableMixin {
   ///
   /// [y] determines cartesian (axis based) vertically position
   /// 0 means most bottom point of the chart
-  FlSpot(double x, double y)
+  const FlSpot(double x, double y)
       : x = x,
         y = y;
 
@@ -457,7 +464,10 @@ class FlSpot with EquatableMixin {
   }
 
   /// Used for splitting lines, or maybe other concepts.
-  static FlSpot nullSpot = FlSpot(double.nan, double.nan);
+  static const FlSpot nullSpot = FlSpot(double.nan, double.nan);
+
+  /// Sets zero for x and y
+  static const FlSpot zero = FlSpot(0, 0);
 
   /// Determines if [x] or [y] is null.
   bool isNull() => this == nullSpot;
@@ -572,7 +582,8 @@ class FlGridData with EquatableMixin {
     return FlGridData(
       show: b.show,
       drawHorizontalLine: b.drawHorizontalLine,
-      horizontalInterval: lerpDouble(a.horizontalInterval, b.horizontalInterval, t),
+      horizontalInterval:
+          lerpDouble(a.horizontalInterval, b.horizontalInterval, t),
       getDrawingHorizontalLine: b.getDrawingHorizontalLine,
       checkToShowHorizontalLine: b.checkToShowHorizontalLine,
       drawVerticalLine: b.drawVerticalLine,
@@ -599,12 +610,16 @@ class FlGridData with EquatableMixin {
       show: show ?? this.show,
       drawHorizontalLine: drawHorizontalLine ?? this.drawHorizontalLine,
       horizontalInterval: horizontalInterval ?? this.horizontalInterval,
-      getDrawingHorizontalLine: getDrawingHorizontalLine ?? this.getDrawingHorizontalLine,
-      checkToShowHorizontalLine: checkToShowHorizontalLine ?? this.checkToShowHorizontalLine,
+      getDrawingHorizontalLine:
+          getDrawingHorizontalLine ?? this.getDrawingHorizontalLine,
+      checkToShowHorizontalLine:
+          checkToShowHorizontalLine ?? this.checkToShowHorizontalLine,
       drawVerticalLine: drawVerticalLine ?? this.drawVerticalLine,
       verticalInterval: verticalInterval ?? this.verticalInterval,
-      getDrawingVerticalLine: getDrawingVerticalLine ?? this.getDrawingVerticalLine,
-      checkToShowVerticalLine: checkToShowVerticalLine ?? this.checkToShowVerticalLine,
+      getDrawingVerticalLine:
+          getDrawingVerticalLine ?? this.getDrawingVerticalLine,
+      checkToShowVerticalLine:
+          checkToShowVerticalLine ?? this.checkToShowVerticalLine,
     );
   }
 
@@ -633,7 +648,7 @@ bool showAllGrids(double value) {
 
 /// Determines the appearance of specified line.
 ///
-/// It gives you an axis value (horizontal or vertical),
+/// It gives you an axis [value] (horizontal or vertical),
 /// you should pass a [FlLine] that represents style of specified line.
 typedef GetDrawingGridLine = FlLine Function(double value);
 
@@ -750,7 +765,8 @@ class RangeAnnotations with EquatableMixin {
         verticalRangeAnnotations = verticalRangeAnnotations ?? const [];
 
   /// Lerps a [RangeAnnotations] based on [t] value, check [Tween.lerp].
-  static RangeAnnotations lerp(RangeAnnotations a, RangeAnnotations b, double t) {
+  static RangeAnnotations lerp(
+      RangeAnnotations a, RangeAnnotations b, double t) {
     return RangeAnnotations(
       horizontalRangeAnnotations: lerpHorizontalRangeAnnotationList(
           a.horizontalRangeAnnotations, b.horizontalRangeAnnotations, t),
@@ -766,8 +782,10 @@ class RangeAnnotations with EquatableMixin {
     List<VerticalRangeAnnotation>? verticalRangeAnnotations,
   }) {
     return RangeAnnotations(
-      horizontalRangeAnnotations: horizontalRangeAnnotations ?? this.horizontalRangeAnnotations,
-      verticalRangeAnnotations: verticalRangeAnnotations ?? this.verticalRangeAnnotations,
+      horizontalRangeAnnotations:
+          horizontalRangeAnnotations ?? this.horizontalRangeAnnotations,
+      verticalRangeAnnotations:
+          verticalRangeAnnotations ?? this.verticalRangeAnnotations,
     );
   }
 

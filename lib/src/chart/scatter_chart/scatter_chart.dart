@@ -1,6 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:fl_chart/src/chart/base/base_chart/fl_touch_event.dart';
-import 'package:fl_chart/src/chart/scatter_chart/scatter_chart_data.dart';
 import 'package:fl_chart/src/chart/scatter_chart/scatter_chart_renderer.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -16,9 +14,13 @@ class ScatterChart extends ImplicitlyAnimatedWidget {
   /// which default is [Curves.linear].
   const ScatterChart(
     this.data, {
+    Key? key,
     Duration swapAnimationDuration = const Duration(milliseconds: 150),
     Curve swapAnimationCurve = Curves.linear,
-  }) : super(duration: swapAnimationDuration, curve: swapAnimationCurve);
+  }) : super(
+            key: key,
+            duration: swapAnimationDuration,
+            curve: swapAnimationCurve);
 
   /// Creates a [_ScatterChartState]
   @override
@@ -62,19 +64,24 @@ class _ScatterChartState extends AnimatedWidgetBaseState<ScatterChart> {
     if (scatterTouchData.enabled && scatterTouchData.handleBuiltInTouches) {
       _providedTouchCallback = scatterTouchData.touchCallback;
       return widget.data.copyWith(
-        scatterTouchData: widget.data.scatterTouchData.copyWith(touchCallback: _handleBuiltInTouch),
+        scatterTouchData: widget.data.scatterTouchData
+            .copyWith(touchCallback: _handleBuiltInTouch),
       );
     }
     return widget.data;
   }
 
-  void _handleBuiltInTouch(FlTouchEvent event, ScatterTouchResponse? touchResponse) {
+  void _handleBuiltInTouch(
+      FlTouchEvent event, ScatterTouchResponse? touchResponse) {
     _providedTouchCallback?.call(event, touchResponse);
 
-    final desiredTouch =
-        event is FlPanDownEvent || event is FlPanUpdateEvent || event is FlPointerHoverEvent;
+    final desiredTouch = event is FlPanDownEvent ||
+        event is FlPanUpdateEvent ||
+        event is FlPointerHoverEvent;
 
-    if (!desiredTouch || touchResponse == null || touchResponse.touchedSpot == null) {
+    if (!desiredTouch ||
+        touchResponse == null ||
+        touchResponse.touchedSpot == null) {
       setState(() {
         touchedSpots = [];
       });

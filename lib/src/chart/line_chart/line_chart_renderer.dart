@@ -4,14 +4,15 @@ import 'package:fl_chart/src/chart/base/base_chart/render_base_chart.dart';
 import 'package:fl_chart/src/chart/line_chart/line_chart_painter.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+
+// coverage:ignore-start
 
 /// Low level LineChart Widget.
 class LineChartLeaf extends LeafRenderObjectWidget {
-  const LineChartLeaf({Key? key, required this.data, required this.targetData, this.drag = false}) : super(key: key);
+  const LineChartLeaf(
+      {Key? key, required this.data, required this.targetData, this.drag = false})
+      : super(key: key);
 
   final LineChartData data, targetData;
 
@@ -19,22 +20,27 @@ class LineChartLeaf extends LeafRenderObjectWidget {
 
   @override
   RenderLineChart createRenderObject(BuildContext context) =>
-      RenderLineChart(context, data, targetData, MediaQuery.of(context).textScaleFactor, drag);
+      RenderLineChart(context, data, targetData, MediaQuery
+          .of(context)
+          .textScaleFactor, drag);
 
   @override
   void updateRenderObject(BuildContext context, RenderLineChart renderObject) {
     renderObject
       ..data = data
       ..targetData = targetData
-      ..textScale = MediaQuery.of(context).textScaleFactor
+      ..textScale = MediaQuery
+          .of(context)
+          .textScaleFactor
       ..buildContext = context;
   }
 }
+// coverage:ignore-end
 
 /// Renders our LineChart, also handles hitTest.
 class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
-  RenderLineChart(
-      BuildContext context, LineChartData data, LineChartData targetData, double textScale, bool drag)
+  RenderLineChart(BuildContext context, LineChartData data,
+      LineChartData targetData, double textScale, bool drag,)
       : _data = data,
         _targetData = targetData,
         _textScale = textScale,
@@ -42,6 +48,7 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
 
   LineChartData get data => _data;
   LineChartData _data;
+
   set data(LineChartData value) {
     if (_data == value) return;
     _data = value;
@@ -50,6 +57,7 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
 
   LineChartData get targetData => _targetData;
   LineChartData _targetData;
+
   set targetData(LineChartData value) {
     if (_targetData == value) return;
     _targetData = value;
@@ -59,13 +67,19 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
 
   double get textScale => _textScale;
   double _textScale;
+
   set textScale(double value) {
     if (_textScale == value) return;
     _textScale = value;
     markNeedsPaint();
   }
 
-  final _painter = LineChartPainter();
+  // We couldn't mock [size] property of this class, that's why we have this
+  @visibleForTesting
+  Size? mockTestSize;
+
+  @visibleForTesting
+  var painter = LineChartPainter();
 
   PaintHolder<LineChartData> get paintHolder {
     return PaintHolder(data, targetData, textScale);
@@ -76,13 +90,21 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
     final canvas = context.canvas;
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
-    _painter.paint(buildContext, CanvasWrapper(canvas, size), paintHolder);
+    painter.paint(
+      buildContext,
+      CanvasWrapper(canvas, mockTestSize ?? size),
+      paintHolder,
+    );
     canvas.restore();
   }
 
   @override
   LineTouchResponse getResponseAtLocation(Offset localPosition) {
-    var touchedSpots = _painter.handleTouch(localPosition, size, paintHolder);
+    var touchedSpots = painter.handleTouch(
+      localPosition,
+      mockTestSize ?? size,
+      paintHolder,
+    );
     return LineTouchResponse(touchedSpots);
   }
 }

@@ -1,15 +1,20 @@
+analyze:
+	flutter analyze
+
+checkFormat:
+	flutter format --set-exit-if-changed --dry-run .
+
 checkstyle:
-	flutter analyze; \
-	flutter format --set-exit-if-changed --dry-run --line-length 100 .
+	make analyze && make checkFormat
 
 format:
-	flutter format --line-length 100 .
+	flutter format .
 
 runTests:
 	flutter test
 
 checkoutToPR:
-	git fetch origin pull/$(id)/head:pr-$(id); \
+	git fetch origin pull/$(id)/head:pr-$(id) --force; \
 	git checkout pr-$(id)
 
 # Tells you in which version this commit has landed
@@ -19,3 +24,12 @@ findVersion:
 # Runs both `make runTests` and `make checkstyle`. Use this before pushing your code.
 sure:
 	make runTests && make checkstyle
+
+# To create generated files (for example mock files in unit_tests)
+codeGen:
+	flutter pub run build_runner build --delete-conflicting-outputs
+
+showTestCoverage:
+	@flutter test --coverage
+	@genhtml coverage/lcov.info -o coverage/html
+	@google-chrome coverage/html/index.html

@@ -31,8 +31,8 @@ class _BarChart extends StatelessWidget {
             int rodIndex,
           ) {
             return BarTooltipItem(
-              rod.y.round().toString(),
-              TextStyle(
+              rod.toY.round().toString(),
+              const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -85,42 +85,48 @@ class _BarChart extends StatelessWidget {
         BarChartGroupData(
           x: 0,
           barRods: [
-            BarChartRodData(y: 8, colors: [Colors.lightBlueAccent, Colors.greenAccent])
+            BarChartRodData(
+                toY: 8, colors: [Colors.lightBlueAccent, Colors.greenAccent])
           ],
           showingTooltipIndicators: [0],
         ),
         BarChartGroupData(
           x: 1,
           barRods: [
-            BarChartRodData(y: 10, colors: [Colors.lightBlueAccent, Colors.greenAccent])
+            BarChartRodData(
+                toY: 10, colors: [Colors.lightBlueAccent, Colors.greenAccent])
           ],
           showingTooltipIndicators: [0],
         ),
         BarChartGroupData(
           x: 2,
           barRods: [
-            BarChartRodData(y: 14, colors: [Colors.lightBlueAccent, Colors.greenAccent])
+            BarChartRodData(
+                toY: 14, colors: [Colors.lightBlueAccent, Colors.greenAccent])
           ],
           showingTooltipIndicators: [0],
         ),
         BarChartGroupData(
           x: 3,
           barRods: [
-            BarChartRodData(y: 15, colors: [Colors.lightBlueAccent, Colors.greenAccent])
+            BarChartRodData(
+                toY: 15, colors: [Colors.lightBlueAccent, Colors.greenAccent])
           ],
           showingTooltipIndicators: [0],
         ),
         BarChartGroupData(
           x: 3,
           barRods: [
-            BarChartRodData(y: 13, colors: [Colors.lightBlueAccent, Colors.greenAccent])
+            BarChartRodData(
+                toY: 13, colors: [Colors.lightBlueAccent, Colors.greenAccent])
           ],
           showingTooltipIndicators: [0],
         ),
         BarChartGroupData(
           x: 3,
           barRods: [
-            BarChartRodData(y: 10, colors: [Colors.lightBlueAccent, Colors.greenAccent])
+            BarChartRodData(
+                toY: 10, colors: [Colors.lightBlueAccent, Colors.greenAccent])
           ],
           showingTooltipIndicators: [0],
         ),
@@ -128,6 +134,8 @@ class _BarChart extends StatelessWidget {
 }
 
 class BarChartSample3 extends StatefulWidget {
+  const BarChartSample3({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => BarChartSample3State();
 }

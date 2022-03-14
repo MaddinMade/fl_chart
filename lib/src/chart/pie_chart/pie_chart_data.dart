@@ -1,12 +1,10 @@
+// coverage:ignore-file
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/utils/lerp.dart';
 import 'package:flutter/material.dart';
-
-import '../base/base_chart/base_chart_data.dart';
-import 'pie_chart.dart';
 
 /// [PieChart] needs this class to render itself.
 ///
@@ -32,8 +30,9 @@ class PieChartData extends BaseChartData with EquatableMixin {
   final PieTouchData pieTouchData;
 
   /// We hold this value to determine weight of each [PieChartSectionData.value].
-  double get sumValue =>
-      sections.map((data) => data.value).reduce((first, second) => first + second);
+  double get sumValue => sections
+      .map((data) => data.value)
+      .reduce((first, second) => first + second);
 
   /// [PieChart] draws some [sections] in a circle,
   /// and applies free space with radius [centerSpaceRadius],
@@ -54,7 +53,8 @@ class PieChartData extends BaseChartData with EquatableMixin {
     double? startDegreeOffset,
     PieTouchData? pieTouchData,
     FlBorderData? borderData,
-  })  : sections = sections ?? const [],
+  })  : sections = sections?.where((element) => element.value != 0).toList() ??
+            const [],
         centerSpaceRadius = centerSpaceRadius ?? double.infinity,
         centerSpaceColor = centerSpaceColor ?? Colors.transparent,
         sectionsSpace = sectionsSpace ?? 2,
@@ -94,10 +94,12 @@ class PieChartData extends BaseChartData with EquatableMixin {
       return PieChartData(
         borderData: FlBorderData.lerp(a.borderData, b.borderData, t),
         centerSpaceColor: Color.lerp(a.centerSpaceColor, b.centerSpaceColor, t),
-        centerSpaceRadius: lerpDoubleAllowInfinity(a.centerSpaceRadius, b.centerSpaceRadius, t),
+        centerSpaceRadius: lerpDoubleAllowInfinity(
+            a.centerSpaceRadius, b.centerSpaceRadius, t),
         pieTouchData: b.pieTouchData,
         sectionsSpace: lerpDouble(a.sectionsSpace, b.sectionsSpace, t),
-        startDegreeOffset: lerpDouble(a.startDegreeOffset, b.startDegreeOffset, t),
+        startDegreeOffset:
+            lerpDouble(a.startDegreeOffset, b.startDegreeOffset, t),
         sections: lerpPieChartSectionDataList(a.sections, b.sections, t),
       );
     } else {
@@ -150,7 +152,7 @@ class PieChartSectionData {
   ///
   /// This can be anything from a text, an image, an animation, and even a combination of widgets.
   /// Use AnimatedWidgets to animate this widget.
-  final Widget badgeWidget;
+  final Widget? badgeWidget;
 
   /// Defines position of showing title in the section.
   ///
@@ -202,8 +204,8 @@ class PieChartSectionData {
         showTitle = showTitle ?? true,
         titleStyle = titleStyle,
         title = title ?? (value == null ? '' : value.toString()),
-        borderSide = borderSide ?? BorderSide(width: 0),
-        badgeWidget = badgeWidget ?? Container(),
+        borderSide = borderSide ?? const BorderSide(width: 0),
+        badgeWidget = badgeWidget,
         titlePositionPercentageOffset = titlePositionPercentageOffset ?? 0.5,
         badgePositionPercentageOffset = badgePositionPercentageOffset ?? 0.5;
 
@@ -238,7 +240,8 @@ class PieChartSectionData {
   }
 
   /// Lerps a [PieChartSectionData] based on [t] value, check [Tween.lerp].
-  static PieChartSectionData lerp(PieChartSectionData a, PieChartSectionData b, double t) {
+  static PieChartSectionData lerp(
+      PieChartSectionData a, PieChartSectionData b, double t) {
     return PieChartSectionData(
       value: lerpDouble(a.value, b.value, t),
       color: Color.lerp(a.color, b.color, t),
@@ -248,10 +251,10 @@ class PieChartSectionData {
       title: b.title,
       borderSide: BorderSide.lerp(a.borderSide, b.borderSide, t),
       badgeWidget: b.badgeWidget,
-      titlePositionPercentageOffset:
-          lerpDouble(a.titlePositionPercentageOffset, b.titlePositionPercentageOffset, t),
-      badgePositionPercentageOffset:
-          lerpDouble(a.badgePositionPercentageOffset, b.badgePositionPercentageOffset, t),
+      titlePositionPercentageOffset: lerpDouble(
+          a.titlePositionPercentageOffset, b.titlePositionPercentageOffset, t),
+      badgePositionPercentageOffset: lerpDouble(
+          a.badgePositionPercentageOffset, b.badgePositionPercentageOffset, t),
     );
   }
 }

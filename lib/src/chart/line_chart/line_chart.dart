@@ -1,8 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:fl_chart/src/chart/base/base_chart/fl_touch_event.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'line_chart_data.dart';
 import 'line_chart_renderer.dart';
 
 /// Renders a line chart as a widget, using provided [LineChartData].
@@ -18,9 +16,13 @@ class LineChart extends ImplicitlyAnimatedWidget {
   /// which default is [Curves.linear].
   const LineChart(this.data, {
     this.longPressInScrollable = true,
+    Key? key,
     Duration swapAnimationDuration = const Duration(milliseconds: 150),
     Curve swapAnimationCurve = Curves.linear,
-  }) : super(duration: swapAnimationDuration, curve: swapAnimationCurve);
+  }) : super(
+      key: key,
+      duration: swapAnimationDuration,
+      curve: swapAnimationCurve);
 
   /// Creates a [_LineChartState]
   @override
@@ -52,7 +54,8 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
   }
 
   LineChartData _withTouchedIndicators(LineChartData lineChartData) {
-    if (!lineChartData.lineTouchData.enabled || !lineChartData.lineTouchData.handleBuiltInTouches) {
+    if (!lineChartData.lineTouchData.enabled ||
+        !lineChartData.lineTouchData.handleBuiltInTouches) {
       return lineChartData;
     }
 
@@ -72,13 +75,15 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     if (lineTouchData.enabled && lineTouchData.handleBuiltInTouches) {
       _providedTouchCallback = lineTouchData.touchCallback;
       return widget.data.copyWith(
-        lineTouchData: widget.data.lineTouchData.copyWith(touchCallback: _handleBuiltInTouch),
+        lineTouchData: widget.data.lineTouchData
+            .copyWith(touchCallback: _handleBuiltInTouch),
       );
     }
     return widget.data;
   }
 
-  void _handleBuiltInTouch(FlTouchEvent event, LineTouchResponse? touchResponse) {
+  void _handleBuiltInTouch(FlTouchEvent event,
+      LineTouchResponse? touchResponse) {
     _providedTouchCallback?.call(event, touchResponse);
 
     if (!event.isInterestedForInteractions ||
